@@ -293,20 +293,32 @@ def UpdateThumbs(image_name):
 	# If they want just a single image, we only have to update 1-3 thumbs...
 	# unless we're using SCGI, then we should always update the whole
 	# directory to save time later.
-	n = None
 	if image_name and not UsingSCGI:
-		realfiles = [f for f in lfiles if os.path.isfile(os.path.join(Paths['current'], f))]
-		
-		try:
-			n = realfiles.index(image_name)
-		except ValueError:
-			pass
-		else:
-			if n > 0:
-				lfiles = realfiles[n-1:n+2]
-			else:
-				lfiles = realfiles[n:n+2]
+		for i in range(len(lfiles)):
+			if lfiles[i] == image_name:
+				newfiles = []
+				
+				# Search backwards for a valid image for the prev link
+				if i > 0:
+					for j in range(i-1, -1, -1):
+						if IMAGE_RE.search(lfiles[j]):
+							newfiles.append(lfiles[j])
+							break
+				
+				# This image
+				newfiles.append(lfiles[i])
+				
+				# Search forwards for a valid image for the next link
+				if i < (len(lfiles) - 1):
+					for j in range(i+1, len(lfiles)):
+						if IMAGE_RE.search(lfiles[j]):
+							newfiles.append(lfiles[j])
+							break
+				
+				lfiles = newfiles
+				break
 	
+	# Time to generate stuff!
 	newthumbs, data['dirs'], data['images'], warnings = generate_thumbnails(Conf, Paths['current'], lfiles)
 	
 	# If it's not the root dir, add '..' to the list of dirs
@@ -417,11 +429,17 @@ def DisplayDir(data):
 # ---------------------------------------------------------------------------
 # Display an image page
 def DisplayImage(data, image_name):
-	# See if it's really there
-	matches = [i for i in data['images'] if i[0] == image_name]
-	if not matches:
+	# See if the image exists
+	n = None
+	for i in range(len(data['images'])):
+		if data['images'][i][0] == image_name:
+			n = i
+			break
+	
+	if n is None:
 		return ShowError('File does not exist: %s' % image_name)
 	
+	# Set up some path info and get our template
 	if Paths['current'] == '.':
 		nicepath = '/'
 	else:
@@ -435,11 +453,9 @@ def DisplayImage(data, image_name):
 	tmpl.extract('show_images')
 	
 	# Work out the prev/next images too
-	this = matches[0]
-	prevlink = ''
-	nextlink = ''
-	
-	n = data['images'].index(this)
+	this = data['images'][n]
+	#prevlink = ''
+	#nextlink = ''
 	
 	# for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width,
 	# thumb_height, resized_width, resized_height in data['images']:
@@ -447,20 +463,23 @@ def DisplayImage(data, image_name):
 	# Previous image
 	if n > 0:
 		prev = data['images'][n-1]
-		prev_enc = Quote(prev[0])
+		prev_enc = Quote(prev[1])
 		img_params = ThumbImgParams(prev[6], prev[7])
 		
 		tmpl['prevlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br />%s</a>' % (
-			SCRIPT_NAME, prev[1], Conf['thumbs_web'], prev[5], img_params, prev_enc)
+			SCRIPT_NAME, prev_enc, Conf['thumbs_web'], prev[5], img_params, prev[0])
 	
 	# Next image
 	if n < (len(data['images']) - 1):
 		next = data['images'][n+1]
-		next_enc = Quote(next[0])
+		next_enc = Quote(next[1])
 		img_params = ThumbImgParams(next[6], next[7])
 		
 		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br />%s</a>' % (
-			SCRIPT_NAME, next[1], Conf['thumbs_web'], next[5], img_params, next_enc)
+			SCRIPT_NAME, next_enc, Conf['thumbs_web'], next[5], img_params, next[0])
+	
+	else:
+		tmpl['nextlink'] = str(data['images'])
 	
 	# If there's a resized one, we'll display that
 	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:

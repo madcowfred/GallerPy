@@ -13,6 +13,10 @@
 * Fixed our except hook. We no longer need the nasty-looking cgitb, yay!
 * Fixed the pidfile writing/unlinking in scgi_daemon.py.
 * Fixed generate_thumbnails so it catches exceptions properly.
+* Fixed the encoded and 'normal' filenames for prev/next image being switched
+  in image display mode.
+* Fixed image display not having prev/next links if there is a non-image as
+  the prev/next file. This also seems to have sped image display up slightly.
 
 -------------------
 0.5.1    2004-12-08
