@@ -3,7 +3,7 @@
 'A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.'
 
 __author__ = 'freddie@madcowdisease.org'
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 # Copyright (c) 2004, Freddie
 # All rights reserved.
@@ -296,7 +296,6 @@ def UpdateThumbs(image_name):
 	
 	# If we're using SCGI, cache the info
 	if UsingSCGI:
-		print 'updated cache for %r<br>' % (Paths['current'])
 		CACHE[Paths['current']] = [files, data]
 	
 	# Throw the info back
