@@ -42,18 +42,30 @@ SCRIPT_NAME = os.getenv('SCRIPT_NAME')
 # ---------------------------------------------------------------------------
 # Spit out a traceback in a sane manner
 def ExceptHook(etype, evalue, etb):
-	html_header('Error!')
+	tmpl = GetTemplate('Error!')
+	
+	tmpl.extract('show_dirs')
+	tmpl.extract('show_images')
+	tmpl.extract('show_image')
+	
+	lines = []
 	
 	for entry in traceback.extract_tb(etb):
-		print '&nbsp;&nbsp;File "<b>%s</b>", line <b>%d</b>, in <b>%s</b><br>' % entry[:-1]
-		print '&nbsp;&nbsp;&nbsp;&nbsp;%s<br><br>' % entry[-1]
+		line = '&nbsp;&nbsp;File "<b>%s</b>", line <b>%d</b>, in <b>%s</b><br>' % entry[:-1]
+		lines.append(line)
+		line = '&nbsp;&nbsp;&nbsp;&nbsp;%s<br><br>' % entry[-1]
+		lines.append(line)
 	
 	for line in traceback.format_exception_only(etype, evalue):
-		print line.replace('\n', '')
+		line = line.replace('\n', '')
+		lines.append(line)
 	
-	print '<br><br>'
+	# Build the error string
+	tmpl['error'] = '\n'.join(lines)
 	
-	html_footer()
+	# Spit it out
+	print tmpl
+	
 	sys.exit(0)
 
 # ---------------------------------------------------------------------------
@@ -329,7 +341,7 @@ def DisplayDir(data):
 		nicepath = '/'
 	else:
 		nicepath = '/%s' % Paths['current']
-	
+	splat()
 	tmpl = GetTemplate(nicepath)
 	
 	# Extract stuff we don't need
