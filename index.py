@@ -15,9 +15,6 @@ CONFIG_FILE = '/home/freddie/source/python/GallerPy/test.conf'
 import time
 Started = time.time()
 
-import cgitb
-cgitb.enable()
-
 import base64
 import Image
 import os
@@ -90,6 +87,9 @@ def main():
 	
 	# Spit out a header
 	html_header()
+	
+	#for k, v in os.environ.items():
+	#	print '%s == %s<br>' % (k, v)
 	
 	# Work out what they're after
 	path_info = os.getenv('PATH_INFO') or '.'
@@ -529,6 +529,9 @@ def html_footer():
 # ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
+	import cgitb
+	cgitb.enable()
+	
 	# Useful speedup
 	try:
 		#pass
