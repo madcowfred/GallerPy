@@ -96,7 +96,11 @@ def main():
 	Warnings = []
 	
 	# Find our config
-	config_file = os.path.join(os.path.dirname(os.getenv('SCRIPT_FILENAME')), 'gallerpy.conf')
+	sfn = os.getenv('SCRIPT_FILENAME')
+	if sfn is None:
+		ShowError('CGI environment is broken!')
+	
+	config_file = os.path.join(os.path.dirname(sfn), 'gallerpy.conf')
 	if not os.path.isfile(config_file):
 		ShowError('config file is missing!')
 	
@@ -110,9 +114,10 @@ def main():
 			Conf[option] = int(Conf[option])
 	
 	# Use a dictionary for speedy lookup of hidden stuff?
-	Conf['hide_dirs'] = {}
+	hide = {}
 	for h in Conf.get('hide_dirs', '').split('|'):
-		Conf['hide_dirs'][h] = 1
+		hide[h] = 1
+	Conf['hide_dirs'] = hide
 	
 	del c
 	
