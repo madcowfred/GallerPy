@@ -253,14 +253,19 @@ def UpdateThumbs(image_name):
 		
 		# Make a new thumbnail if we have to
 		if gen_thumb:
-			img = OPEN.get(ext, Image.open)(image_file)
+			try:
+				img = OPEN.get(ext, Image.open)(image_file)
+			except IOError, msg:
+				print "Warning: failed to open '%s' - %s<br>\n" % (filename, msg)
+				continue
+			
 			image_width, image_height = img.size
 			
 			# Resize and save it
 			try:
 				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
 			except IOError, msg:
-				print 'Warning: failed to resize %s! %s<br>' % (filename, msg)
+				print "Warning: failed to resize '%s' - %s<br>\n" % (filename, msg)
 				continue
 			
 			thumb_width, thumb_height = img.size
