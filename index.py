@@ -242,8 +242,14 @@ def UpdateThumbs(image_name):
 			image_width, image_height = img.size
 			
 			# Resize and save it
-			img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
+			try:
+				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
+			except IOError, msg:
+				print 'Warning: failed to resize %s! %s<br>' % (filename, msg)
+				continue
+			
 			thumb_width, thumb_height = img.size
+			
 			try:
 				img.save(thumb_file)
 			except:
