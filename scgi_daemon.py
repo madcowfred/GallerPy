@@ -100,7 +100,7 @@ def main(handler=GallerPyHandler):
 	host = "127.0.0.1"
 	
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], 'FP:l:m:p:')
+		opts, args = getopt.getopt(sys.argv[1:], 'FL:P:m:p:')
 	except getopt.GetoptError, exc:
 		print >>sys.stderr, exc
 		print >>sys.stderr, usage
