@@ -11,7 +11,6 @@ import time
 sys.path.append(os.path.expanduser('~/lib/python/PIL'))
 
 from ConfigParser import ConfigParser
-from index import CONFIG_FILE
 
 import Image
 
@@ -39,7 +38,7 @@ def main():
 	Conf = {}
 	
 	c = ConfigParser()
-	c.read(CONFIG_FILE)
+	c.read('gallerpy.conf')
 	
 	for option in c.options('options'):
 		if option.startswith('thumb_') or option.startswith('image_'):
@@ -165,7 +164,11 @@ def walk(top):
 	
 	dirs, nondirs = [], []
 	for name in names:
-		if isdir(join(top, name)):
+		topname = join(top, name)
+		
+		if isdir(topname):
+			dirs.append(name)
+		elif islink(topname) and isdir(normpath(topname)):
 			dirs.append(name)
 		else:
 			nondirs.append(name)
@@ -174,9 +177,9 @@ def walk(top):
 	
 	for name in dirs:
 		path = join(top, name)
-		if not islink(path):
-			for x in walk(path):
-				yield x
+		#if not islink(path):
+		for x in walk(path):
+			yield x
 
 # ---------------------------------------------------------------------------
 
