@@ -3,7 +3,7 @@
 'A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.'
 
 __author__ = 'freddie@madcowdisease.org'
-__version__ = '0.5.2pre'
+__version__ = '0.6.0pre'
 
 # Copyright (c) 2004, Freddie
 # All rights reserved.
@@ -32,13 +32,8 @@ __version__ = '0.5.2pre'
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# ---------------------------------------------------------------------------
-
 import time
 Started = time.time()
-
-import cgitb
-cgitb.enable()
 
 import os
 import re
@@ -58,29 +53,31 @@ IMAGE_RE = re.compile(r'\.(gif|jpe?g|png)$', re.I)
 # ---------------------------------------------------------------------------
 # Spit out a traceback in a sane manner
 def ExceptHook(etype, evalue, etb):
-	tmpl = GetTemplate('Error!')
-	
-	tmpl.extract('show_dirs')
-	tmpl.extract('show_images')
-	tmpl.extract('show_image')
-	
 	lines = []
 	
+	lines.append('<h2>Kaboom!</h2>')
+	
+	lines.append('<pre>')
+	
 	for entry in traceback.extract_tb(etb):
-		line = '&nbsp;&nbsp;File "<b>%s</b>", line <b>%d</b>, in <b>%s</b><br />' % entry[:-1]
+		dirname, filename = os.path.split(entry[0])
+		
+		line = 'File "<b>%s</b>", line <b>%d</b>, in <b>%s</b>' % (
+			filename, entry[1], entry[2])
 		lines.append(line)
-		line = '&nbsp;&nbsp;&nbsp;&nbsp;%s<br /><br />' % entry[-1]
+		line = '  %s' % entry[-1]
 		lines.append(line)
+	
+	lines.append('')
 	
 	for line in traceback.format_exception_only(etype, evalue):
 		line = line.replace('\n', '')
 		lines.append(line)
 	
-	# Build the error string
-	tmpl['error'] = '\n'.join(lines)
+	lines.append('</pre>')
 	
-	# Spit it out
-	print tmpl
+	# Now spit it out
+	ShowError('\n'.join(lines))
 	
 	sys.exit(0)
 
@@ -98,6 +95,9 @@ def ShowError(text, *args):
 	
 	tmpl['error'] = text
 	tmpl['elapsed'] = '%.3fs' % (time.time() - Started)
+	
+	print 'Content-type: text/html'
+	print
 	print tmpl
 	
 	return None
@@ -223,10 +223,29 @@ def main(env=os.environ, started=Started, scgi=0):
 	
 	t5 = time.time()
 	
-	# And spit it out
-	print tmpl
+	# We are HTML!
+	print 'Content-type: text/html'
 	
-	# Timing info
+	# If we're using GZIP, it might be time to squish
+	if Conf['use_gzip'] and env.get('HTTP_ACCEPT_ENCODING', '').find('gzip') >= 0:
+		import cStringIO
+		import gzip
+		
+		zbuf = cStringIO.StringIO()
+		gzip.GzipFile(mode='wb', fileobj=zbuf, compresslevel=Conf['use_gzip']).write(str(tmpl))
+		
+		# Spit out our gzip headers
+		print 'Content-Encoding: gzip'
+		print 'Content-Length: %d' % (zbuf.tell())
+		print
+		print zbuf.getvalue()
+	
+	# Just normal output please
+	else:
+		print
+		print tmpl
+	
+	# Debug info
 	if 0:
 		print 'startup: %.4fs<br />\n' % (t1 - Started)
 		print 'parse_env: %.4fs<br />\n' % (t2 - t1)
@@ -234,6 +253,9 @@ def main(env=os.environ, started=Started, scgi=0):
 		print 'display: %.4fs<br />\n' % (t4 - t3)
 		print 'finish_tmpl: %.4fs<br />\n' % (t5 - t4)
 		print 'print_tmpl: %.4fs<br />\n' % (time.time() - t5)
+		
+		for k, v in env.items():
+			print k, '=>', v, '<br>'
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data

@@ -20,6 +20,9 @@ img {
 p {
 	margin: 0.1em 0 0.1em 0;
 }
+pre {
+	font-size: 1.6em;
+}
 
 div.container {
 	margin: 0px;
