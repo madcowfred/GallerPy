@@ -193,10 +193,6 @@ def main(env=os.environ, started=Started):
 	
 	t3 = time.time()
 	
-	squishy = open('/tmp/squishy.log', 'w')
-	squishy.write('image_name: %s\n' % image_name)
-	squishy.write('path_info: %s\n' % path_info)
-	
 	# If we have an image name, try to display it
 	if image_name:
 		tmpl = DisplayImage(data, image_name)
