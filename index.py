@@ -590,12 +590,10 @@ if __name__ == '__main__':
 	
 	# Useful speedup
 	try:
-		#pass
 		import psyco
-		#psyco.bind(DisplayDir)
 		psyco.bind(UpdateThumbs)
 		psyco.bind(JpegImagePlugin.JpegImageFile._open)
-	except:
+	except ImportError:
 		pass
 	
 	SentHeader = 0
