@@ -20,6 +20,7 @@ import Image
 import os
 import re
 import sys
+import traceback
 
 from ConfigParser import ConfigParser
 
@@ -44,6 +45,14 @@ SCRIPT_NAME = os.getenv('SCRIPT_NAME')
 
 # ---------------------------------------------------------------------------
 
+def ExceptHook(etype, evalue, etb):
+	html_header('Error!')
+	traceback.print_exception(etype, evalue, etb)
+	html_footer()
+	sys.exit(0)
+
+# ---------------------------------------------------------------------------
+
 def ShowError(text, *args):
 	if args:
 		text = text % args
@@ -52,11 +61,9 @@ def ShowError(text, *args):
 	html_footer()
 	sys.exit(0)
 
+# ---------------------------------------------------------------------------
+
 def main():
-	# Standard header
-	print 'Content-type: text/html'
-	print
-	
 	# Some naughty globals
 	global Conf, Paths
 	Conf = {}
@@ -485,6 +492,11 @@ def Quote(s):
 # ---------------------------------------------------------------------------
 
 def html_header(title=None):
+	global SentHeader
+	if SentHeader:
+		return
+	SentHeader = 1
+	
 	if title:
 		title = 'GallerPy %s: %s' % (__version__, title)
 	else:
@@ -501,6 +513,11 @@ def html_header(title=None):
 	add = (Conf['thumb_name'] + Conf['thumb_dimensions'] + Conf['thumb_size']) * 15
 	thumb_height = Conf['thumb_height'] + 15 + add
 	
+	# Standard header
+	print 'Content-type: text/html'
+	print
+	
+	# HTML junk
 	print \
 """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -528,6 +545,11 @@ div.thumbnail {
 # ---------------------------------------------------------------------------
 
 def html_footer(fudgeval=None):
+	global SentFooter
+	if SentFooter:
+		return
+	SentFooter = 1
+	
 	if fudgeval is None:
 		fudgeval = 0.0
 	elapsed = '%.3fs' % (max(0.0, time.time() - Started - fudgeval))
@@ -543,8 +565,8 @@ def html_footer(fudgeval=None):
 # ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
-	import cgitb
-	cgitb.enable()
+	# Replace our exception handler with a magic one
+	sys.excepthook = ExceptHook
 	
 	# Useful speedup
 	try:
@@ -558,5 +580,8 @@ if __name__ == '__main__':
 	
 	#import profile
 	#profile.run('main()', 'profile.data')
+	
+	SentHeader = 0
+	SentFooter = 0
 	
 	main()
