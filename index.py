@@ -238,15 +238,16 @@ def UpdateThumbs(image_name):
 		else:
 			image_width, image_height = OPEN.get(ext, Image.open)(image_file).size
 			
-			per_w = float(Conf['thumb_width']) / image_width
-			per_h = float(Conf['thumb_height']) / image_height
+			x, y = image_width, image_height
 			
-			if per_w <= per_h:
-				thumb_width = 160
-				thumb_height = int(image_height * per_w)
-			else:
-				thumb_width = int(image_width * per_h)
-				thumb_height = 120
+			if x > Conf['thumb_width']:
+				y = y * Conf['thumb_width'] / x
+				x = Conf['thumb_width']
+			if y > Conf['thumb_height']:
+				x = x * Conf['thumb_height'] / y
+				y = Conf['thumb_height']
+			
+			thumb_width, thumb_height = x, y
 		
 		# Get the 'nice' ('45.3KB') size of the image
 		image_size = _nicesize(image_stat.st_size)
@@ -305,6 +306,9 @@ def DisplayDir(data):
 <div class="spacer"></div>
 """
 		
+		# Lines we want to print
+		lines = []
+		
 		# Save on function lookups
 		_quote = Quote
 		_tip = ThumbImgParams
@@ -329,10 +333,15 @@ def DisplayDir(data):
 			
 			extra = '<br>'.join(extras)
 			
-			# Spit it out
-			print \
+			# Build the line and keep it for later
+			line = \
 """<div class="thumbnail"><a href="%s/%s"><img src="%s/%s" %s></a>%s</div>""" % (
 	SCRIPT_NAME, _quote(image_file), Paths['thumbs_web'], thumb_name, img_params, extra)
+			
+			lines.append(line)
+		
+		if lines:
+			print '\n'.join(lines)
 
 # ---------------------------------------------------------------------------
 # Display an image page
