@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 
-"""
-A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.
-"""
+'A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.'
 
 __author__ = 'freddie@madcowdisease.org'
-__version__ = '0.1'
-
-# SET THIS!
-CONFIG_FILE = '/home/freddie/source/python/GallerPy/test.conf'
+__version__ = '0.2'
 
 # ---------------------------------------------------------------------------
 # We need to know when we started for later
@@ -78,9 +73,14 @@ def main():
 	Conf = {}
 	Paths = {}
 	
+	# Find our config
+	config_file = os.path.join(os.path.dirname(os.getenv('SCRIPT_FILENAME')), 'gallerpy.conf')
+	if not os.path.isfile(config_file):
+		ShowError('config file is missing!')
+	
 	# Parse our config
 	c = ConfigParser()
-	c.read(CONFIG_FILE)
+	c.read(config_file)
 	
 	for option in c.options('options'):
 		if option.startswith('thumb_') or option.startswith('image_'):
