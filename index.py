@@ -341,7 +341,7 @@ def DisplayDir(data):
 		nicepath = '/'
 	else:
 		nicepath = '/%s' % Paths['current']
-	splat()
+	
 	tmpl = GetTemplate(nicepath)
 	
 	# Extract stuff we don't need
