@@ -609,8 +609,8 @@ if __name__ == '__main__':
 	try:
 		#pass
 		import psyco
-		#Psyco.bind(DisplayDir)
-		Psyco.bind(UpdateThumbs)
+		#psyco.bind(DisplayDir)
+		psyco.bind(UpdateThumbs)
 		psyco.bind(JpegImagePlugin.JpegImageFile._open)
 	except:
 		pass
