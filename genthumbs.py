@@ -167,9 +167,9 @@ def main():
 		print 'Removed %d stale thumbnails' % (killed)
 
 # ---------------------------------------------------------------------------
-
+# Borrowed from Python 2.3's os module since it doesn't exist in 2.2
 def walk(top):
-	from os.path import join, isdir, islink
+	from os.path import join, isdir, islink, normpath
 	
 	try:
 		names = os.listdir(top)
