@@ -115,7 +115,7 @@ class StringTemplate:
             token = source[i+a+dw:i+b-dw]
             substitute = substitutions.get(token, '')
             subtype = type(substitute)
-            if subtype in [types.TupleType, types.InstanceType, types.DictType]:
+            if subtype in [types.ListType, types.TupleType, types.InstanceType, types.DictType]:
                 newsearch = '<!--{%s}-->'% token
                 groupsubpat = re.compile(newsearch)
                 groupmatch = groupsubpat.search(source[i+b+3:])
@@ -126,7 +126,7 @@ class StringTemplate:
                     groups[token] = StringTemplate(source[i+b:i+b+startendtoken])
                     source = source[:i+a-4] + source[i+b+endendtoken:]
                     newsubs = substitutions.copy()
-                    if subtype == types.TupleType:
+                    if subtype in (types.ListType, types.TupleType):
                          for row in substitute:
                             newsubs = substitutions.copy()
                             newsubs.update(row)

@@ -3,7 +3,6 @@
 'A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.'
 
 __author__ = 'freddie@madcowdisease.org'
-__version__ = '0.6.0pre'
 
 # Copyright (c) 2004, Freddie
 # All rights reserved.
@@ -40,7 +39,7 @@ import re
 import sys
 import traceback
 
-from gallerpy import load_config, generate_thumbnails, walk
+from gallerpy import __version__, load_config, generate_thumbnails, walk
 from yats import TemplateDocument
 
 # ---------------------------------------------------------------------------
@@ -89,6 +88,7 @@ def ShowError(text, *args):
 	
 	tmpl = GetTemplate('Error!')
 	
+	tmpl.extract('show_text')
 	tmpl.extract('show_dirs')
 	tmpl.extract('show_images')
 	tmpl.extract('show_image')
@@ -346,11 +346,6 @@ def DisplayDir(data):
 	
 	tmpl = GetTemplate(nicepath)
 	
-	# Extract stuff we don't need
-	tmpl.extract('show_image')
-	
-	shown = 0
-	
 	# If we have some dirs, display them
 	dirs = []
 	
@@ -362,13 +357,10 @@ def DisplayDir(data):
 			
 			# Parent dir
 			elif directory == '..':
-				shown = 1
-				
 				blat = os.path.join(Paths['current'], '..')
 				dir_link = os.path.normpath(blat)
 			
 			else:
-				shown = 1
 				if Paths['current'] == '.':
 					dir_link = directory
 				else:
@@ -382,10 +374,19 @@ def DisplayDir(data):
 			
 			dirs.append(row)
 	
-	tmpl['dirs'] = tuple(dirs)
-	if not dirs:
+	# Extract stuff we don't need
+	headpath = os.path.join(Paths['current'], Conf['header_file'])
+	if os.path.isfile(headpath):
+		tmpl['header_text'] = open(headpath, 'r').read()
+	else:
+		tmpl.extract('show_text')
+	
+	if dirs:
+		tmpl['dirs'] = dirs
+	else:
 		tmpl.extract('show_dirs')
 	
+	tmpl.extract('show_image')
 	
 	# If we have some images, display those
 	images = []
@@ -420,8 +421,9 @@ def DisplayDir(data):
 			
 			images.append(row)
 	
-	tmpl['images'] = tuple(images)
-	if not images:
+	if images:
+		tmpl['images'] = images
+	else:
 		tmpl.extract('show_images')
 	
 	return tmpl
@@ -449,6 +451,7 @@ def DisplayImage(data, image_name):
 	tmpl = GetTemplate(nicepath)
 	
 	# Extract stuff we don't need
+	tmpl.extract('show_text')
 	tmpl.extract('show_dirs')
 	tmpl.extract('show_images')
 	

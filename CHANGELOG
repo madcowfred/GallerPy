@@ -1,6 +1,8 @@
 -------------------
 0.6.0    2004-12-??
 -------------------
+* Added a 'header_file' option, which displays the contents of a text file if
+  it exists in the current directory. See gallerpy.conf for details.
 * Added GZIP encoding support. See gallerpy.conf for details.
 * Added 'croncheck.py'. Edit the CHECKME section under the license, then run
   it regularly from your crontab to restart your SCGI daemons. Very useful if
@@ -17,6 +19,7 @@
   in image display mode.
 * Fixed image display not having prev/next links if there is a non-image as
   the prev/next file.
+* Various minor cleanups.
 
 -------------------
 0.5.1    2004-12-08
