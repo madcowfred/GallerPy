@@ -364,15 +364,15 @@ def DisplayDir(data):
 			parts = []
 			
 			if Conf['thumb_name']:
-				part = '<br />%s' % image_name.replace('_', ' ')
+				part = '<p>%s</p>' % image_name.replace('_', ' ')
 				parts.append(part)
 			
 			if Conf['thumb_dimensions']:
-				part = '<br /><span>(%s x %s)</span>' % (image_width, image_height)
+				part = '<p class="small">(%s x %s)</p>' % (image_width, image_height)
 				parts.append(part)
 			
 			if Conf['thumb_size']:
-				part = '<br /><span>%s</span>' % (image_size)
+				part = '<p class="small">%s</p>' % (image_size)
 				parts.append(part)
 			
 			row['extra'] = ''.join(parts)
@@ -442,25 +442,25 @@ def DisplayImage(data, image_name):
 	
 	# If there's a resized one, we'll display that
 	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:
-		tmpl['this_img'] = '(resized)<br /><a href="%s/%s/_full_"><img src="%s/%s" width="%s" height="%s" alt="%s"></a>' % (
+		tmpl['this_img'] = '    (resized)<br /><a href="%s/%s/_full_"><img src="%s/%s" width="%s" height="%s" alt="%s"></a>' % (
 			SCRIPT_NAME, this[1], Conf['resized_web'], this[5], this[-2], this[-1], this[0]
 		)
 	# Guess not, just display the image
 	else:
-		tmpl['this_img'] = '<img src="%s" width="%s" height="%s" alt="%s">' % (
+		tmpl['this_img'] = '    <img src="%s" width="%s" height="%s" alt="%s">' % (
 			Quote(GetPaths(this[1])[0]), this[3], this[4], this[0])
 	
 	# Work out what extra info we need to display
 	parts = []
 	
 	if Conf['image_name']:
-		part = '<h2>%s</h2><br />\n' % (this[0])
+		part = '    <h2>%s</h2>\n' % (this[0])
 		parts.append(part)
 	if Conf['image_dimensions']:
-		part = '<span>%s x %s</span><br />\n' % (this[3], this[4])
+		part = '    <p class="small">%s x %s</p>\n' % (this[3], this[4])
 		parts.append(part)
 	if Conf['image_size']:
-		part = '<span>%s</span><br />\n' % (this[2])
+		part = '    <p class="small">%s</p>\n' % (this[2])
 		parts.append(part)
 	
 	tmpl['extra'] = ''.join(parts)
@@ -538,8 +538,8 @@ def GetTemplate(title=None):
 	# Work out the box size for thumbnails
 	tmpl['thumb_width'] = Conf['thumb_width'] + 10
 	
-	add = (Conf['thumb_name'] + Conf['thumb_dimensions'] + Conf['thumb_size']) * 15
-	tmpl['thumb_height'] = Conf['thumb_height'] + 15 + add
+	add = (Conf['thumb_name'] + Conf['thumb_dimensions'] + Conf['thumb_size']) * 16
+	tmpl['thumb_height'] = Conf['thumb_height'] + 16 + add
 	
 	# Our version!
 	tmpl['version'] = __version__

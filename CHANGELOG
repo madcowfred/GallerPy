@@ -5,7 +5,9 @@
   then run it regularly from your crontab to restart your SCGI daemons.
   Very useful if your web host ever gets restarted or whatever.
 * Updated the default template and some bits and pieces of internal code
-  to XHTML 1.1.
+  to XHTML 1.1, and properly indented code.
+* Updated the CSS to use 'safer' sizing values. Some slightly larger
+  folder/thumbnail boxes help with IE5/6 and it's weird layout.
 * Fix the pidfile writing/unlinking in scgi_daemon.py.
 
 -------------------
