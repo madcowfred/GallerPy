@@ -86,8 +86,8 @@ def main(handler=GallerPyHandler):
 	usage = """Usage: %s [options]
 
     -F -- stay in foreground (don't fork)
-    -P -- PID filename
-    -l -- log filename
+    -L -- log filename
+    -P -- pid filename
     -m -- max children
     -p -- TCP port to listen on
 """ % sys.argv[0]
@@ -109,10 +109,10 @@ def main(handler=GallerPyHandler):
 	for o, v in opts:
 		if o == "-F":
 			nofork = 1
+		elif o == "-L":
+			logfilename = v
 		elif o == "-P":
 			pidfilename = v
-		elif o == "-l":
-			logfilename = v
 		elif o == "-m":
 			max_children = int(v)
 		elif o == "-p":

@@ -37,29 +37,31 @@ import signal
 import sys
 
 # ---------------------------------------------------------------------------
-# Tuple of (pidfile, path, command) tuples
+# Tuple of things we should be checking
 CHECKME = (
-	(
-		'/home/freddie/scgi/test.pid',
-		'/home/freddie/www/test.home',
-		'python scgi_daemon.py -P /home/freddie/scgi/test.pid -l /home/freddie/scgi/test.log',
-	),
-	(
-		'/home/freddie/scgi/test2.pid',
-		'/home/freddie/www/test2.home',
-		'python scgi_daemon.py -P /home/freddie/scgi/test2.pid -l /home/freddie/scgi/test2.log',
-	),
+	{
+		'pidfile': '/home/freddie/scgi/test.pid',
+		'logfile': '/home/freddie/scgi/test.log',
+		'path': '/home/freddie/www/test.home',
+		'command': 'python scgi_daemon.py -P %(pidfile)s -L %(logfile)s',
+	},
+	{
+		'pidfile': '/home/freddie/scgi/test2.pid',
+		'logfile': '/home/freddie/scgi/test2.log',
+		'path': '/home/freddie/www/test2.home',
+		'command': 'python scgi_daemon.py -P %(pidfile)s -L %(logfile)s',
+	},
 )
 
 # ---------------------------------------------------------------------------
 
 def main():
-	for pidfile, cmdpath, cmdline in CHECKME:
+	for info in CHECKME:
 		start = 0
 		
 		# If the pidfile is real, check the pid
-		if os.path.isfile(pidfile):
-			pid = int(open(pidfile, 'r').read())
+		if os.path.isfile(info['pidfile']):
+			pid = int(open(info['pidfile'], 'r').read())
 			
 			try:
 				os.kill(pid, signal.SIGCHLD)
@@ -71,11 +73,11 @@ def main():
 		
 		# If we have to, start it up
 		if start:
-			print 'Starting in %s...' % (cmdpath),
+			print 'Starting in %s...' % (info['path']),
 			sys.stdout.flush()
 			
-			os.chdir(cmdpath)
-			os.system(cmdline)
+			os.chdir(info['path'])
+			os.system(info['command'] % info)
 			
 			print 'done.'
 

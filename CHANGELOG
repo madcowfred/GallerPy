@@ -9,8 +9,10 @@
   use proper indenting, and also valid XHTML 1.1.
 * Updated the CSS to use 'safer' sizing values. Taller folder/thumbnail divs
   also help with IE5/6 and it's weird layout engine.
+* Changed scgi_daemon.py to use -L for log filename so it matches -P.
 * Fixed our except hook. We no longer need the nasty-looking cgitb, yay!
 * Fixed the pidfile writing/unlinking in scgi_daemon.py.
+* Fixed generate_thumbnails so it catches exceptions properly.
 
 -------------------
 0.5.1    2004-12-08
