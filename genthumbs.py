@@ -66,9 +66,6 @@ def main():
 	os.chdir(walkdir)
 	
 	# And off we go
-	print 'Generating, please wait...',
-	sys.stdout.flush()
-	
 	made = 0
 	
 	for root, dirs, files in os.walk(walkdir):
@@ -77,6 +74,8 @@ def main():
 		
 		if root == walkdir:
 			continue
+		
+		print '> Entering %s' % (root)
 		
 		dirs.sort()
 		files.sort()
@@ -117,23 +116,35 @@ def main():
 			
 			# Make a new thumbnail now
 			if gen_thumb:
+				print '-> Thumbnailing %s...' % (filename),
+				sys.stdout.flush()
+				
 				# Open it
 				img = OPEN.get(fext, Image.open)(image_file)
 				image_width, image_height = img.size
 				
 				# Resize and save it
-				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
+				try:
+					img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
+				except IOError, msg:
+					print 'failed: %s' % msg
+					continue
+				
 				thumb_width, thumb_height = img.size
+				
 				try:
 					img.save(thumb_file)
-				except:
-					print 'Warning: failed to resize %s!<br>' % (filename)
+				except Exception, msg:
+					print 'failed: %s' % (msg)
 					continue
+				
+				print 'OK.'
 				
 				made += 1
 	
 	# Done
-	print 'generated %d thumbs in %.1fs' % (made, time.time() - started)
+	print
+	print 'Generated %d thumbnails in %.1fs' % (made, time.time() - started)
 
 # ---------------------------------------------------------------------------
 
