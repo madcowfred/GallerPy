@@ -527,7 +527,7 @@ div.thumbnail {
 
 # ---------------------------------------------------------------------------
 
-def html_footer(fudgeval):
+def html_footer(fudgeval=0.0):
 	elapsed = '%.3fs' % (max(0.0, time.time() - Started - fudgeval))
 	
 	print \
