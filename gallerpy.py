@@ -18,7 +18,6 @@ import PngImagePlugin
 
 OPEN = {
 	'.gif': GifImagePlugin.GifImageFile,
-	'.jpe': JpegImagePlugin.JpegImageFile,
 	'.jpg': JpegImagePlugin.JpegImageFile,
 	'.jpeg': JpegImagePlugin.JpegImageFile,
 	'.png': PngImagePlugin.PngImageFile,
@@ -36,19 +35,24 @@ def load_config(filepath):
 		if Conf[option].isdigit():
 			Conf[option] = int(Conf[option])
 	
-	Conf['hide_dirs'] = Conf['hide_dirs'].split('|')
+	Conf['hide_dirs'] = {}.fromkeys(Conf['hide_dirs'].split('|'), 1)
 	
 	return Conf
 
 # ---------------------------------------------------------------------------
 # Generate thumbnails
 def generate_thumbnails(Conf, root, files, sizes=1):
+	dirs = []
 	images = []
-	newthumbs = 0
 	warnings = []
+	newthumbs = 0
 	
 	for image_name in files:
 		image_path = os.path.join(root, image_name)
+		
+		if os.path.isdir(image_path):
+			dirs.append(image_name)
+			continue
 		
 		# Skip images we don't know about
 		froot, fext = os.path.splitext(image_path)
@@ -132,11 +136,11 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			image_size = None
 		
 		# Keep the data for a bit later
-		image_data = (image_path, image_name, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height)
+		image_data = (image_name, image_path, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height)
 		images.append(image_data)
 	
 	# All done
-	return newthumbs, images, warnings
+	return newthumbs, dirs, images, warnings
 
 # ---------------------------------------------------------------------------
 # Borrowed from Python 2.3 so we still work with 2.2
