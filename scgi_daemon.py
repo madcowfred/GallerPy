@@ -68,8 +68,8 @@ def main(handler=GallerPyHandler):
 """ % sys.argv[0]
 	
 	nofork = 0
-	pidfilename = "/tmp/gallerpy-wp.pid"
-	logfilename = "/var/gallerpy-wp.log"
+	pidfilename = "/tmp/gallerpy.pid"
+	logfilename = "/tmp/gallerpy.log"
 	max_children = 2    # scgi default
 	port = 35001
 	host = "127.0.0.1"
