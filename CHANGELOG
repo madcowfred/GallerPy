@@ -16,7 +16,7 @@
 * Fixed the encoded and 'normal' filenames for prev/next image being switched
   in image display mode.
 * Fixed image display not having prev/next links if there is a non-image as
-  the prev/next file. This also seems to have sped image display up slightly.
+  the prev/next file.
 
 -------------------
 0.5.1    2004-12-08
