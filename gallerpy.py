@@ -147,7 +147,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			# Open the image
 			try:
 				img = OPEN.get(lfext, Image.open)(image_path)
-			except IOError, msg:
+			except Exception, msg:
 				warning = "Warning: failed to open '%s' - %s" % (image_name, msg)
 				warnings.append(warning)
 				continue
@@ -157,7 +157,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			# Thumbnail it
 			try:
 				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), resize_method)
-			except IOError, msg:
+			except Exception, msg:
 				warning = "Warning: failed to resize '%s' - %s" % (image_name, msg)
 				warnings.append(warning)
 				continue
@@ -200,7 +200,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			# Open the image
 			try:
 				img = OPEN.get(lfext, Image.open)(image_path)
-			except IOError, msg:
+			except Exception, msg:
 				warning = "Warning: failed to open '%s' - %s" % (image_name, msg)
 				warnings.append(warning)
 				continue
@@ -212,7 +212,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 				# Resize it
 				try:
 					img.thumbnail((Conf['resized_width'], Conf['resized_height']), resize_method)
-				except IOError, msg:
+				except Exception, msg:
 					warning = "Warning: failed to resize '%s' - %s" % (image_name, msg)
 					warnings.append(warning)
 					continue
