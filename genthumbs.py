@@ -62,7 +62,7 @@ def main():
 	
 	# Done
 	print
-	print 'Generated %d thumbnails in %.1fs' % (made, time.time() - started)
+	print 'Generated %d thumbnail(s) in %.1fs' % (made, time.time() - started)
 	
 	# Now clean up any missing thumbs
 	killed = 0
