@@ -17,7 +17,7 @@ Installation
 
 
 3. Now you need to do some Apache modifying. If you just want a single vhost
-   with gallery magic, you'll need something like:
+   with gallery magic, you'll need something like this in your httpd.conf:
    
    <VirtualHost www.kapow.com>
        # normal vhost options
@@ -28,7 +28,12 @@ Installation
        </Directory>
    </VirtualHost>
    
-   Not sure if you can do this with a .htaccess file.
+   Or if your web host allows it, you can do it with a .htaccess file in your
+   gallery directory:   
+   
+   AddHandler cgi-script .py
+   DirectoryIndex index.py
+   Options +ExecCGI
 
 
 4. Finally, make your thumbs directory and get things ready:
@@ -38,4 +43,10 @@ Installation
    $ chmod 755 index.py    (executable, so it works)
 
 
-5. Test it out!
+5. Test it out! If you get a 500 Interal server error, try running index.py
+   from the command line:
+   
+   $ python index.py
+   
+   If it works there, try changing the first line of index.py to point to
+   your python binary ('which python').
