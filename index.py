@@ -101,9 +101,6 @@ def main():
 	
 	Paths['folder_image'] = GetPaths(Conf['folder_image'])[0] or 'folder.png'
 	
-	# Spit out a header
-	html_header()
-	
 	#for k, v in os.environ.items():
 	#	print '%s == %s<br>' % (k, v)
 	
@@ -284,6 +281,13 @@ def UpdateThumbs(image_name):
 # ---------------------------------------------------------------------------
 # Spit out a nicely formatted listing of a directory
 def DisplayDir(data):
+	# Spit out a header
+	if Paths['current'] == '.':
+		nicepath = '/'
+	else:
+		nicepath = '/%s' % Paths['current']
+	html_header(nicepath)
+	
 	shown = 0
 	
 	# If we have some dirs, display them
@@ -342,22 +346,21 @@ def DisplayDir(data):
 			img_params = _tip(thumb_width, thumb_height)
 			
 			# Maybe add some extra stuff
-			extras = []
+			parts = []
 			
 			if Conf['thumb_name']:
-				nice_name = image_name.replace('_', ' ')
-				extras.append(nice_name)
+				part = '<br>%s' % image_name.replace('_', ' ')
+				parts.append(part)
 			
 			if Conf['thumb_dimensions']:
-				extra = '<span>(%s x %s)</span>' % (image_width, image_height)
-				extras.append(extra)
+				part = '<br><span>(%s x %s)</span>' % (image_width, image_height)
+				parts.append(part)
 			
 			if Conf['thumb_size']:
-				extra = '<span>%s</span>' % (image_size)
-				extras.append(extra)
+				part = '<br><span>%s</span>' % (image_size)
+				parts.append(part)
 			
-			if extras:
-				extra = '<br>' + '<br>'.join(extras)
+			extra = ''.join(parts)
 			
 			# Build the line and keep it for later
 			line = \
@@ -379,8 +382,15 @@ def DisplayImage(data, image_name):
 	# See if it's really there
 	matches = [i for i in data['images'] if i[0] == image_name]
 	if not matches:
-		print 'ERROR: file does not exist!'
-		return
+		ShowError('file does not exist!')
+	
+	# Spit out a header
+	if Paths['current'] == '.':
+		nicepath = '/'
+	else:
+		nicepath = '/%s' % Paths['current']
+	nicepath = '%s/%s' % (nicepath, image_name)
+	html_header(nicepath)
 	
 	# Work out the prev/next images too
 	this = matches[0]
@@ -415,21 +425,18 @@ def DisplayImage(data, image_name):
 	
 	# Work out what extra info we need to display
 	parts = []
+	
 	if Conf['image_name']:
-		part = '<h2>%s</h2>' % (this[0])
+		part = '<h2>%s</h2><br>\n' % (this[0])
 		parts.append(part)
 	if Conf['image_dimensions']:
-		part = '<span>%s x %s</span>' % (this[3], this[4])
+		part = '<span>%s x %s</span><br>\n' % (this[3], this[4])
 		parts.append(part)
 	if Conf['image_size']:
-		part = '<span>%s</span>' % (this[2])
+		part = '<span>%s</span><br>\n' % (this[2])
 		parts.append(part)
 	
-	if parts:
-		extra = '<br>\n'.join(parts)
-	else:
-		extra = ''
-	
+	extra = ''.join(parts)
 	
 	t = time.time()
 	
@@ -445,8 +452,7 @@ def DisplayImage(data, image_name):
 <div class="container">
 <div class="spacer"></div>
 <div class="image">
-%s
-%s
+%s%s
 </div>""" % (
 	prevlink, SCRIPT_NAME, Paths['current'], Paths['folder_image'], nextlink, extra, this_img)
 	
@@ -512,10 +518,13 @@ def html_header(title=None):
 		return
 	SentHeader = 1
 	
+	# Build our shiny <title>
+	gallery_name = Conf.get('gallery_name', 'GallerPy %s' % __version__)
+	
 	if title:
-		title = 'GallerPy %s: %s' % (__version__, title)
+		title = '%s :: %s' % (gallery_name, title)
 	else:
-		title = 'GallerPy %s' % (__version__)
+		title = '%s' % (gallery_name)
 	
 	# Find our CSS file
 	css_file = GetPaths(Conf['css_file'])[0]
