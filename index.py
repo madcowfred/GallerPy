@@ -117,20 +117,20 @@ def main():
 	
 	# Now that we've done all that, update the thumbnails
 	data = UpdateThumbs(image_name)
-	print 'UpdateThumbs: %.5fs<br>' % (time.time() - Started)
+	#print 'UpdateThumbs: %.5fs<br>' % (time.time() - Started)
 	
 	# If we have an image name, try to display it
 	if image_name:
-		DisplayImage(data, image_name)
+		fudgeval = DisplayImage(data, image_name)
 	
 	# Or we could just display the directory
 	else:
-		DisplayDir(data)
+		fudgeval = DisplayDir(data)
 	
-	print 'Display: %.5fs' % (time.time() - Started)
+	#print 'Display: %.5fs' % (time.time() - Started)
 	
 	# Spit out a footer
-	html_footer()
+	html_footer(fudgeval)
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
@@ -264,8 +264,6 @@ def UpdateThumbs(image_name):
 def DisplayDir(data):
 	shown = 0
 	
-	t1 = time.time()
-	
 	# If we have some dirs, display them
 	if data['dirs']:
 		# Use a dictionary for speedy lookup
@@ -295,8 +293,6 @@ def DisplayDir(data):
 			print \
 """<div class="folder"><a href="%s/%s"><img src="%s" alt="folder"><br>%s</a></div>""" % (
 	SCRIPT_NAME, dir_link, Paths['folder_image'], dir_desc)
-	
-	t2 = time.time()
 	
 	# If we have some images, display those
 	if data['images']:
@@ -344,12 +340,12 @@ def DisplayDir(data):
 			
 			lines.append(line)
 		
-		t3 = time.time()
+		t = time.time()
 		
 		if lines:
 			print '\n'.join(lines)
 		
-		print 't1: %.3fs - t2: %.3fs - t3: %.3fs<br>\n' % (t2-t1, t3-t2, time.time()-t3)
+		return time.time() - t
 
 # ---------------------------------------------------------------------------
 # Display an image page
@@ -409,6 +405,8 @@ def DisplayImage(data, image_name):
 		extra = ''
 	
 	
+	t = time.time()
+	
 	print \
 """<table border="0" cellpadding="0" cellspacing="0" align="center">
 <tr>
@@ -425,6 +423,8 @@ def DisplayImage(data, image_name):
 %s
 </div>""" % (
 	prevlink, SCRIPT_NAME, Paths['current'], Paths['folder_image'], nextlink, extra, this_img)
+	
+	return time.time() - t
 
 # ---------------------------------------------------------------------------
 # Get a (URL, local) path for something
@@ -523,8 +523,8 @@ div.thumbnail {
 
 # ---------------------------------------------------------------------------
 
-def html_footer():
-	elapsed = '%.4fs' % (time.time() - Started)
+def html_footer(fudgeval):
+	elapsed = '%.4fs' % (max(0.0, time.time() - Started - fudgeval))
 	
 	print \
 """<div class="spacer"></div>
