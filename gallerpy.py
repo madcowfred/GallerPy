@@ -187,3 +187,10 @@ def NiceSize(bytes):
 		return '%.1fMB' % (bytes / 1024.0 / 1024.0)
 
 # ---------------------------------------------------------------------------
+# Useful speedup on larger dirs
+try:
+	import psyco
+	psyco.bind(generate_thumbnails)
+	psyco.bind(JpegImagePlugin.JpegImageFile._open)
+except ImportError:
+	pass
