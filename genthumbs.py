@@ -68,6 +68,8 @@ def main():
 	os.chdir(walkdir)
 	
 	# And off we go
+	os.umask(0000)
+	
 	made = 0
 	
 	for root, dirs, files in os.walk(walkdir):
