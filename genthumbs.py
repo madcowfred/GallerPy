@@ -98,7 +98,7 @@ def main():
 			fext = m.group(2).lower()
 			
 			# Work out our goofy thumbnail name
-			b64 = base64.encodestring(froot)[:-1]
+			b64 = base64.encodestring(froot).replace('\n', '')
 			thumb_name = '%s.%s' % (b64, fext)
 			thumb_file = os.path.join(thumb_path, thumb_name)
 			

@@ -199,7 +199,7 @@ def UpdateThumbs(image_name):
 			continue
 		
 		# Work out our goofy thumbnail name
-		b64 = _b64_enc(root)[:-1]
+		b64 = _b64_enc(root).replace('\n', '')
 		thumb_name = '%s.%s' % (b64, ext)
 		thumb_file = os.path.join(Paths['thumbs_local'], thumb_name)
 		
