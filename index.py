@@ -454,8 +454,6 @@ def DisplayImage(data, image_name):
 	
 	# Work out the prev/next images too
 	this = data['images'][n]
-	#prevlink = ''
-	#nextlink = ''
 	
 	# for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width,
 	# thumb_height, resized_width, resized_height in data['images']:
@@ -470,16 +468,13 @@ def DisplayImage(data, image_name):
 			SCRIPT_NAME, prev_enc, Conf['thumbs_web'], prev[5], img_params, prev[0])
 	
 	# Next image
-	if n < (len(data['images']) - 1):
+	if data['images'][n+1:n+2]:
 		next = data['images'][n+1]
 		next_enc = Quote(next[1])
 		img_params = ThumbImgParams(next[6], next[7])
 		
 		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br />%s</a>' % (
 			SCRIPT_NAME, next_enc, Conf['thumbs_web'], next[5], img_params, next[0])
-	
-	else:
-		tmpl['nextlink'] = str(data['images'])
 	
 	# If there's a resized one, we'll display that
 	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:
