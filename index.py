@@ -241,17 +241,16 @@ def UpdateThumbs(image_name):
 			images.append([filename, image_file, root, ext])
 	
 	# If they want just a single image, we only have to update 1-3 thumbs
-	only_update = []
-	
 	if image_name:
-		matches = [i for i in images if i[0] == image_name]
-		if matches:
-			n = images.index(matches[0])
+		try:
+			n = images.index(image_name)
+		except ValueError
+			only_update = []
+		else:
 			if n > 0:
-				only_update.append(images[n-1][0])
-			only_update.append(matches[0][0])
-			if n < (len(images) - 1):
-				only_update.append(images[n+1][0])
+				only_update = images[n-1:n+2]
+			else:
+				only_update = images[n:n+2]
 	
 	# Now we do the thumbnail stuff
 	for filename, image_file, root, ext in images:
