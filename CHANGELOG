@@ -1,11 +1,15 @@
 -------------------
 0.5.0    2004-12-??
 -------------------
+* Added 'use_resized' and 'resized_width'/'resized_height' options
 * Split most of the interesting code into gallerpy.py, it makes no sense
   to have huge chunks of duplicated code in index and genthumbs. This
-  will also make it easier to embed a gallery into a Python web app.
+  will also (hopefully) make it easier to embed a gallery into a Python
+  web app.
 * Added an SCGI handler daemon with some sexy caching. Speedup seems to
-  be around 10x :) See INSTALL_SCGI for instructions on using it.
+  be around 10x :) See INSTALL_SCGI for some bad instructions on using it.
+* Added an option to set the image resize method. See sample.conf for
+  details.
 
 -------------------
 0.4.0    2004-11-12

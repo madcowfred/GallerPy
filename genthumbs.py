@@ -15,6 +15,8 @@ def main():
 	
 	if 'thumbs_local' not in Conf:
 		Conf['thumbs_local'] = 'thumbs'
+	if 'resized_local' not in Conf:
+		Conf['resized_local'] = '_resized'
 	
 	started = time.time()
 	

@@ -47,6 +47,12 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 	warnings = []
 	newthumbs = 0
 	
+	# Work out what resize mode we're supposed to use
+	if Conf['resize_method'] == 'antialias':
+		resize_method = Image.ANTIALIAS
+	else:
+		resize_method = Image.BICUBIC
+	
 	for image_name in files:
 		image_path = os.path.join(root, image_name)
 		
@@ -60,12 +66,14 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 		if lfext not in OPEN:
 			continue
 		
-		# Work out our thumbnail filename
+		# We need a base64 encoded filename
 		b64 = base64.encodestring(froot).replace('\n', '')
+		
+		# Work out our thumbnail filename
 		thumb_name = '%s%s' % (b64, fext)
 		thumb_path = os.path.join(Conf['thumbs_local'], thumb_name)
 		
-		# If it exists and is old, delete it
+		# See if we need to generate a new thumbnail
 		image_stat = os.stat(image_path)
 		try:
 			thumb_stat = os.stat(thumb_path)
@@ -82,6 +90,31 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			else:
 				gen_thumb = 0
 		
+		# If resized is enabled, I guess we do that
+		if Conf['use_resized']:
+			# Work out our resized filename
+			resized_path = os.path.join(Conf['resized_local'], thumb_name)
+			
+			# See if we need to generate a new resized image
+			try:
+				resized_stat = os.stat(resized_path)
+			except OSError:
+				gen_resized = 1
+			else:
+				if image_stat.st_mtime > resized_stat.st_mtime:
+					try:
+						os.remove(resized_path)
+					except OSError:
+						continue
+					else:
+						gen_resized = 1
+				else:
+					gen_resized = 0
+		# Or not
+		else:
+			gen_resized = 0
+		
+		
 		# Make a new thumbnail if we have to
 		if gen_thumb:
 			# Open the image
@@ -96,7 +129,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			
 			# Thumbnail it
 			try:
-				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
+				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), resize_method)
 			except IOError, msg:
 				warning = "Warning: failed to resize '%s' - %s" % (image_name, msg)
 				warnings.append(warning)
@@ -114,7 +147,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			
 			newthumbs += 1
 		
-		# We need to get image size info from the file
+		# Or we need to get image size info from the file
 		elif sizes == 1:
 			image_width, image_height = OPEN.get(fext, Image.open)(image_path).size
 			
@@ -134,6 +167,65 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			image_width, image_height = 0, 0
 			thumb_width, thumb_height = 0, 0
 		
+		
+		# Make a new resized image if we have to
+		if gen_resized:
+			# Open the image
+			try:
+				img = OPEN.get(lfext, Image.open)(image_path)
+			except IOError, msg:
+				warning = "Warning: failed to open '%s' - %s" % (image_name, msg)
+				warnings.append(warning)
+				continue
+			
+			image_width, image_height = img.size
+			
+			# See if it's worth resizing
+			if image_width > Conf['resized_width'] or image_height > Conf['resized_height']:
+				# Resize it
+				try:
+					img.thumbnail((Conf['resized_width'], Conf['resized_height']), resize_method)
+				except IOError, msg:
+					warning = "Warning: failed to resize '%s' - %s" % (image_name, msg)
+					warnings.append(warning)
+					continue
+				
+				resized_width, resized_height = img.size
+				
+				# Save the resized image
+				try:
+					img.save(resized_path)
+				except Exception, msg:
+					warning = "Warning: failed to save '%s' - %s" % (image_name, msg)
+					warnings.append(warning)
+					continue
+			
+			else:
+				resized_width, resized_height = 0, 0
+		
+		# Or we need to get image size info from the file
+		elif sizes == 1:
+			if (image_width, image_height) == (0, 0):
+				image_width, image_height = OPEN.get(fext, Image.open)(image_path).size
+			
+			x, y = image_width, image_height
+			
+			if x > Conf['resized_width']:
+				y = y * Conf['resized_width'] / x
+				x = Conf['resized_width']
+			if y > Conf['resized_height']:
+				x = x * Conf['resized_height'] / y
+				y = Conf['resized_height']
+			
+			resized_width, resized_height = x, y
+		
+		# They don't care
+		else:
+			image_width, image_height = 0, 0
+			thumb_width, thumb_height = 0, 0
+			resized_width, resized_height = 0, 0
+		
+		
 		# Get the 'nice' ('45.3KB') file size of the image
 		if sizes == 1:
 			image_size = NiceSize(image_stat.st_size)
@@ -141,7 +233,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			image_size = None
 		
 		# Keep the data for a bit later
-		image_data = (image_name, image_path, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height)
+		image_data = (image_name, image_path, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height, resized_width, resized_height)
 		images.append(image_data)
 	
 	# All done

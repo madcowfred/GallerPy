@@ -106,6 +106,12 @@ def main(env=os.environ, started=Started):
 		if Conf['thumbs_local'] is None:
 			ShowError("Can't find your thumbnail directory!")
 	
+	if Conf['use_resized']:
+		if not ('resized_local' in Conf and 'resized_web' in Conf):
+			Conf['resized_web'], Conf['resized_local'] = GetPaths('_resized')
+			if Conf['resized_local'] is None:
+				ShowError("Can't find your resized image directory!")
+	
 	Paths['folder_image'] = GetPaths(Conf['folder_image'])[0] or 'folder.png'
 	
 	# Work out what they're after
@@ -121,7 +127,17 @@ def main(env=os.environ, started=Started):
 	# If there's an image on the end, we want it
 	image_name = None
 	
-	bits = list(os.path.split(path_info))
+	bits = list(path_info.split('/'))
+	
+	# See if they want a full image
+	global FullImage
+	FullImage = 0
+	
+	if bits[-1] == '_full_':
+		blah = bits.pop(-1)
+		FullImage = 1
+	
+	# See if they're after an image
 	m = IMAGE_RE.search(bits[-1])
 	if m:
 		image_name = bits.pop(-1)
@@ -130,7 +146,7 @@ def main(env=os.environ, started=Started):
 	# Don't let people go into hidden dirs
 	if len(bits) > 0:
 		if bits[-1] in Conf['hide_dirs']:
-			ShowError('Path does not exist: %s', path_info)
+			ShowError('Access denied: %s', path_info)
 	
 	# Check the path to make sure it's valid
 	image_dir = GetPaths(path_info)[1]
@@ -169,10 +185,12 @@ def main(env=os.environ, started=Started):
 	# And spit it out
 	print tmpl
 	
-	print 't1: %.4fs<br>\n' % (t1 - Started)
-	print 't2: %.4fs<br>\n' % (t2 - t1)
-	print 't3: %.4fs<br>\n' % (t3 - t2)
-	print 't4: %.4fs<br>\n' % (time.time() - t3)
+	# Timing info
+	if 0:
+		print 't1: %.4fs<br>\n' % (t1 - Started)
+		print 't2: %.4fs<br>\n' % (t2 - t1)
+		print 't3: %.4fs<br>\n' % (t3 - t2)
+		print 't4: %.4fs<br>\n' % (time.time() - t3)
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
@@ -182,13 +200,25 @@ def UpdateThumbs(image_name):
 	
 	if Paths['current'] in CACHE:
 		if files is CACHE[Paths['current']][0]:
-			return CACHE[Paths['current']][1]
-	
-	CACHE[Paths['current']] = [files,]
+			data = CACHE[Paths['current']][1]
+			# If they just wanted an image, return only the 1-3 they need
+			if image_name:
+				try:
+					n = files.index(image_name)
+				except ValueError:
+					pass
+				else:
+					if n > 0:
+						return { 'dirs': [], 'images': data['images'][n-1:n+2] }
+					else:
+						return { 'dirs': [], 'images': data['images'][n:n+2] }
+			# Guess they want the whole lot
+			else:
+				return data
 	
 	# Get a sorted list of filenames
-	files = list(files)
-	files.sort()
+	lfiles = list(files)
+	lfiles.sort()
 	
 	# Initialise the data structure
 	data = {
@@ -198,23 +228,27 @@ def UpdateThumbs(image_name):
 	
 	if Paths['current'] == '.':
 		try:
-			files.remove(Conf['folder_image'])
+			lfiles.remove(Conf['folder_image'])
 		except ValueError:
 			pass
 	
-	# If they want just a single image, we only have to update 1-3 thumbs
+	# If they want just a single image, we only have to update 1-3 thumbs...
+	# but we do have to sort out files/dirs here
+	n = None
 	if image_name:
+		realfiles = [f for f in lfiles if os.path.isfile(os.path.join(Paths['current'], f))]
+		
 		try:
-			n = files.index(image_name)
+			n = realfiles.index(image_name)
 		except ValueError:
 			pass
 		else:
 			if n > 0:
-				files = files[n-1:n+2]
+				lfiles = realfiles[n-1:n+2]
 			else:
-				files = files[n:n+2]
+				lfiles = realfiles[n:n+2]
 	
-	newthumbs, data['dirs'], data['images'], warnings = generate_thumbnails(Conf, Paths['current'], files)
+	newthumbs, data['dirs'], data['images'], warnings = generate_thumbnails(Conf, Paths['current'], lfiles)
 	
 	# If it's not the root dir, add '..' to the list of dirs
 	if Paths['current'] != '.':
@@ -223,8 +257,11 @@ def UpdateThumbs(image_name):
 	# If we had any warnings, stick them into the errors thing
 	Warnings.extend(warnings)
 	
+	# If it was a full visit, save the cache info
+	if n is None:
+		CACHE[Paths['current']] = [files, data]
+	
 	# Throw the info back
-	CACHE[Paths['current']].append(data)
 	return data
 
 # ---------------------------------------------------------------------------
@@ -283,7 +320,7 @@ def DisplayDir(data):
 	images = []
 	
 	if data['images']:
-		for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height in data['images']:
+		for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height, resized_width, resized_height in data['images']:
 			row = {}
 			
 			# Maybe add some extra stuff
@@ -322,7 +359,10 @@ def DisplayImage(data, image_name):
 	# See if it's really there
 	matches = [i for i in data['images'] if i[0] == image_name]
 	if not matches:
-		ShowError('file does not exist!')
+		open('/tmp/silly.log', 'a').write(repr(Paths['current']) + '\n')
+		open('/tmp/silly.log', 'a').write(repr(image_name) + '\n')
+		open('/tmp/silly.log', 'a').write(repr(data['images']) + '\n')
+		ShowError('File does not exist: %s' % image_name)
 	
 	if Paths['current'] == '.':
 		nicepath = '/'
@@ -363,9 +403,18 @@ def DisplayImage(data, image_name):
 		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
 			SCRIPT_NAME, next[1], Conf['thumbs_web'], next[5], img_params, next_enc)
 	
-	# This image
-	tmpl['this_img'] = '<img src="%s" width="%s" height="%s" alt="%s">' % (
-		Quote(GetPaths(this[1])[0]), this[3], this[4], this[0])
+	# for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width,
+	# thumb_height, resized_width, resized_height in data['images']:
+	
+	# If there's a resized one, we'll display that
+	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:
+		tmpl['this_img'] = '(resized)<br><a href="%s/%s/_full_"><img src="%s/%s" width="%s" height="%s" alt="%s"></a>' % (
+			SCRIPT_NAME, this[1], Conf['resized_web'], this[5], this[-2], this[-1], this[0]
+		)
+	# Guess not, just display the image
+	else:
+		tmpl['this_img'] = '<img src="%s" width="%s" height="%s" alt="%s">' % (
+			Quote(GetPaths(this[1])[0]), this[3], this[4], this[0])
 	
 	# Work out what extra info we need to display
 	parts = []
