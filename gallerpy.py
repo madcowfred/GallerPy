@@ -82,8 +82,9 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			else:
 				gen_thumb = 0
 		
-		# Get the image dimensions
-		if sizes == 1:
+		# Make a new thumbnail if we have to
+		if gen_thumb:
+			# Open the image
 			try:
 				img = OPEN.get(lfext, Image.open)(image_path)
 			except IOError, msg:
@@ -92,11 +93,8 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 				continue
 			
 			image_width, image_height = img.size
-		else:
-			image_width, image_height = 0, 0
-		
-		# Make a new thumbnail if we have to
-		if gen_thumb:
+			
+			# Thumbnail it
 			try:
 				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
 			except IOError, msg:
@@ -106,6 +104,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			
 			thumb_width, thumb_height = img.size
 			
+			# Save the thumbnail
 			try:
 				img.save(thumb_path)
 			except Exception, msg:
@@ -115,19 +114,25 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			
 			newthumbs += 1
 		
-		# Or get thumbnail info
+		# We need to get image size info from the file
+		elif sizes == 1:
+			image_width, image_height = OPEN.get(fext, Image.open)(image_path).size
+			
+			x, y = image_width, image_height
+			
+			if x > Conf['thumb_width']:
+				y = y * Conf['thumb_width'] / x
+				x = Conf['thumb_width']
+			if y > Conf['thumb_height']:
+				x = x * Conf['thumb_height'] / y
+				y = Conf['thumb_height']
+			
+			thumb_width, thumb_height = x, y
+		
+		# They don't care
 		else:
-			if sizes == 1:
-				try:
-					img = OPEN.get(lfext, Image.open)(thumb_path)
-				except IOError, msg:
-					warning = "Warning: failed to open '%s' - %s" % (thumb_path, msg)
-					warnings.append(warning)
-					continue
-				
-				thumb_width, thumb_height = img.size
-			else:
-				thumb_width, thumb_height = 0, 0
+			image_width, image_height = 0, 0
+			thumb_width, thumb_height = 0, 0
 		
 		# Get the 'nice' ('45.3KB') file size of the image
 		if sizes == 1:
