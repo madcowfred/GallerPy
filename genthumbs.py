@@ -149,8 +149,23 @@ def main():
 				made += 1
 	
 	# Done
+	now = time.time()
 	print
-	print 'Generated %d thumbnails in %.1fs' % (made, time.time() - started)
+	print 'Generated %d thumbnails in %.1fs' % (made, now - started)
+	
+	# Now clean up any missing thumbs
+	killed = 0
+	for filename in os.listdir(thumb_path):
+		root, ext = os.path.splitext(filename)
+		decoded = '%s%s' % (base64.decodestring(root).replace('\n', ''), ext)
+		
+		if not os.path.exists(decoded):
+			filepath = os.path.join(thumb_path, filename)
+			os.remove(filepath)
+			killed += 1
+	
+	if killed:
+		print 'Removed %d stale thumbnails in %.1fs' % (killed, time.time() - now)
 
 # ---------------------------------------------------------------------------
 
