@@ -254,8 +254,8 @@ def main(env=os.environ, started=Started, scgi=0):
 		print 'finish_tmpl: %.4fs<br />\n' % (t5 - t4)
 		print 'print_tmpl: %.4fs<br />\n' % (time.time() - t5)
 		
-		for k, v in env.items():
-			print k, '=>', v, '<br>'
+		#for k, v in env.items():
+		#	print k, '=>', v, '<br>'
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
