@@ -1,0 +1,17 @@
+---------------------
+0.2.1      2004-04-17
+---------------------
+* Add error handling for image files that aren't openable.
+
+---------------------
+0.2.0      2004-04-13
+---------------------
+* Change the config file so it's read from gallerpy.conf in the current
+  directory.
+* Don't display/thumbnail our folder image if it's inside the gallery.
+* Don't let people enter hidden directories manually. This fixes a nasty
+  issue with going into thumbs, oops :)
+
+---------------------
+0.1.0      2004-04-12
+---------------------
