@@ -95,8 +95,8 @@ def main():
 	path_info = os.getenv('PATH_INFO') or '.'
 	
 	# Don't want a starting seperator
-	if path_info.startswith(os.path.sep):
-		path_info = path_info[len(os.path.sep):]
+	if path_info.startswith(os.sep):
+		path_info = path_info[len(os.sep):]
 	
 	# If there's an image on the end, we wants it
 	image_name = None
@@ -425,7 +425,7 @@ def GetPaths(path):
 	dsn = os.path.dirname(SCRIPT_NAME)
 	
 	# Absolute path
-	if path.startswith(os.path.sep):
+	if path.startswith(os.sep):
 		return (path, None)
 	# HTTP URL
 	elif path.startswith('http://'):

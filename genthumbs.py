@@ -56,7 +56,7 @@ def main():
 		walkdir = os.path.abspath(sys.argv[1])
 	else:
 		walkdir = os.path.abspath('.')
-	walklen = len(os.pathsep) + len(walkdir)
+	walklen = len(os.sep) + len(walkdir)
 	
 	# Make sure our thumbs dir exists
 	thumb_path = os.path.join(walkdir, 'thumbs')
