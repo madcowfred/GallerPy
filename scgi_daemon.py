@@ -70,7 +70,7 @@ class GallerPyHandler(scgi_server.SCGIHandler):
 		
 		# Show the page
 		if 1:
-			index.main(env, started)
+			index.main(env=env, started=started, scgi=1)
 		
 		# Clean up
 		try:

@@ -97,13 +97,18 @@ def ShowError(text, *args):
 	tmpl.extract('show_image')
 	
 	tmpl['error'] = text
+	tmpl['elapsed'] = '%.3fs' % (time.time() - Started)
 	print tmpl
 	
-	sys.exit(0)
+	return None
 
 # ---------------------------------------------------------------------------
 
-def main(env=os.environ, started=Started):
+def main(env=os.environ, started=Started, scgi=0):
+	global Started, UsingSCGI
+	Started = started
+	UsingSCGI = scgi
+	
 	t1 = time.time()
 	
 	# We need these
@@ -118,11 +123,11 @@ def main(env=os.environ, started=Started):
 	
 	# Find our config
 	if SCRIPT_FILENAME is None:
-		ShowError('CGI environment is broken!')
+		return ShowError('CGI environment is broken!')
 	
 	config_file = os.path.join(os.path.dirname(SCRIPT_FILENAME), 'gallerpy.conf')
 	if not os.path.isfile(config_file):
-		ShowError('config file is missing!')
+		return ShowError('config file is missing!')
 	
 	# Parse our config
 	Conf = load_config(config_file)
@@ -131,13 +136,13 @@ def main(env=os.environ, started=Started):
 	if not ('thumbs_local' in Conf and 'thumbs_web' in Conf):
 		Conf['thumbs_web'], Conf['thumbs_local'] = GetPaths('thumbs')
 		if Conf['thumbs_local'] is None:
-			ShowError("Can't find your thumbnail directory!")
+			return ShowError("Can't find your thumbnail directory!")
 	
 	if Conf['use_resized']:
 		if not ('resized_local' in Conf and 'resized_web' in Conf):
 			Conf['resized_web'], Conf['resized_local'] = GetPaths('_resized')
 			if Conf['resized_local'] is None:
-				ShowError("Can't find your resized image directory!")
+				return ShowError("Can't find your resized image directory!")
 	
 	Paths['folder_image'] = GetPaths(Conf['folder_image'])[0] or 'folder.png'
 	
@@ -175,12 +180,12 @@ def main(env=os.environ, started=Started):
 	# Don't let people go into hidden dirs
 	if len(bits) > 0:
 		if bits[-1] in Conf['hide_dirs']:
-			ShowError('Access denied: %s', path_info)
+			return ShowError('Access denied: %s', path_info)
 	
 	# Check the path to make sure it's valid
 	image_dir = GetPaths(path_info)[1]
 	if image_dir is None:
-		ShowError('Path does not exist: %s', path_info)
+		return ShowError('Path does not exist: %s', path_info)
 	
 	
 	# We need to know what the current dir is
@@ -201,9 +206,14 @@ def main(env=os.environ, started=Started):
 	else:
 		tmpl = DisplayDir(data)
 	
+	# An error occurred
+	if tmpl is None:
+		return
+	
+	t4 = time.time()
+	
 	# Work out how long it took
-	elapsed = '%.3fs' % (time.time() - started)
-	tmpl['elapsed'] = elapsed
+	tmpl['elapsed'] = '%.3fs' % (time.time() - started)
 	
 	# If we had any warnings, add those
 	if Warnings:
@@ -211,15 +221,19 @@ def main(env=os.environ, started=Started):
 	else:
 		tmpl.extract('show_error')
 	
+	t5 = time.time()
+	
 	# And spit it out
 	print tmpl
 	
 	# Timing info
 	if 0:
-		print 't1: %.4fs<br>\n' % (t1 - Started)
-		print 't2: %.4fs<br>\n' % (t2 - t1)
-		print 't3: %.4fs<br>\n' % (t3 - t2)
-		print 't4: %.4fs<br>\n' % (time.time() - t3)
+		print 'startup: %.4fs<br>\n' % (t1 - Started)
+		print 'parse_env: %.4fs<br>\n' % (t2 - t1)
+		print 'thumbs: %.4fs<br>\n' % (t3 - t2)
+		print 'display: %.4fs<br>\n' % (t4 - t3)
+		print 'finish_tmpl: %.4fs<br>\n' % (t5 - t4)
+		print 'print_tmpl: %.4fs<br>\n' % (time.time() - t5)
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
@@ -227,23 +241,10 @@ def UpdateThumbs(image_name):
 	# Ask dircache for a list of files
 	files = dircache.listdir(Paths['current'])
 	
-	if Paths['current'] in CACHE:
-		if files is CACHE[Paths['current']][0]:
-			data = CACHE[Paths['current']][1]
-			# If they just wanted an image, return only the 1-3 they need
-			if image_name:
-				try:
-					n = files.index(image_name)
-				except ValueError:
-					pass
-				else:
-					if n > 0:
-						return { 'dirs': [], 'images': data['images'][n-1:n+2] }
-					else:
-						return { 'dirs': [], 'images': data['images'][n:n+2] }
-			# Guess they want the whole lot
-			else:
-				return data
+	if UsingSCGI:
+		if Paths['current'] in CACHE:
+			if files is CACHE[Paths['current']][0]:
+				return CACHE[Paths['current']][1]
 	
 	# Get a sorted list of filenames
 	lfiles = list(files)
@@ -268,9 +269,10 @@ def UpdateThumbs(image_name):
 			pass
 	
 	# If they want just a single image, we only have to update 1-3 thumbs...
-	# but we do have to sort out files/dirs here
+	# unless we're using SCGI, then we should always update the whole
+	# directory to save time later.
 	n = None
-	if image_name:
+	if image_name and not UsingSCGI:
 		realfiles = [f for f in lfiles if os.path.isfile(os.path.join(Paths['current'], f))]
 		
 		try:
@@ -292,8 +294,9 @@ def UpdateThumbs(image_name):
 	# If we had any warnings, stick them into the errors thing
 	Warnings.extend(warnings)
 	
-	# If it was a full visit, save the cache info
-	if n is None:
+	# If we're using SCGI, cache the info
+	if UsingSCGI:
+		print 'updated cache for %r<br>' % (Paths['current'])
 		CACHE[Paths['current']] = [files, data]
 	
 	# Throw the info back
@@ -394,10 +397,7 @@ def DisplayImage(data, image_name):
 	# See if it's really there
 	matches = [i for i in data['images'] if i[0] == image_name]
 	if not matches:
-		open('/tmp/silly.log', 'a').write(repr(Paths['current']) + '\n')
-		open('/tmp/silly.log', 'a').write(repr(image_name) + '\n')
-		open('/tmp/silly.log', 'a').write(repr(data['images']) + '\n')
-		ShowError('File does not exist: %s' % image_name)
+		return ShowError('File does not exist: %s' % image_name)
 	
 	if Paths['current'] == '.':
 		nicepath = '/'
@@ -418,7 +418,8 @@ def DisplayImage(data, image_name):
 	
 	n = data['images'].index(this)
 	
-	# filename, path+filename, img_size, img_width, img_height, thumb_name, thumb_width, thumb_height
+	# for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width,
+	# thumb_height, resized_width, resized_height in data['images']:
 	
 	# Previous image
 	if n > 0:
@@ -437,9 +438,6 @@ def DisplayImage(data, image_name):
 		
 		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
 			SCRIPT_NAME, next[1], Conf['thumbs_web'], next[5], img_params, next_enc)
-	
-	# for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width,
-	# thumb_height, resized_width, resized_height in data['images']:
 	
 	# If there's a resized one, we'll display that
 	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:
@@ -468,8 +466,6 @@ def DisplayImage(data, image_name):
 	
 	tmpl['dir_path'] = '%s/%s' % (SCRIPT_NAME, Paths['current'])
 	tmpl['folder_img'] = Paths['folder_image']
-	
-	#prevlink, SCRIPT_NAME, Paths['current'], Paths['folder_image'], nextlink, extra, this_img)
 	
 	return tmpl
 
