@@ -72,7 +72,7 @@ def main():
 	
 	made = 0
 	
-	for root, dirs, files in os.walk(walkdir):
+	for root, dirs, files in walk(walkdir):
 		for hide in Conf['hide_dirs']:
 			if hide in dirs:
 				dirs.remove(hide)
@@ -150,6 +150,31 @@ def main():
 	# Done
 	print
 	print 'Generated %d thumbnails in %.1fs' % (made, time.time() - started)
+
+# ---------------------------------------------------------------------------
+
+def walk(top):
+	from os.path import join, isdir, islink
+	
+	try:
+		names = os.listdir(top)
+	except OSError:
+		return
+	
+	dirs, nondirs = [], []
+	for name in names:
+		if isdir(join(top, name)):
+			dirs.append(name)
+		else:
+			nondirs.append(name)
+	
+	yield top, dirs, nondirs
+	
+	for name in dirs:
+		path = join(top, name)
+		if not islink(path):
+			for x in walk(path):
+				yield x
 
 # ---------------------------------------------------------------------------
 
