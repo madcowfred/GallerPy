@@ -1,11 +1,11 @@
 -------------------
-0.?.?    ????-??-??
+0.5.2    2004-12-??
 -------------------
-* Update the default template and some bits and pieces of internal code
-  to XHTML 1.1.
 * Included 'croncheck.py'. Edit the CHECKME section under the license,
   then run it regularly from your crontab to restart your SCGI daemons.
   Very useful if your web host ever gets restarted or whatever.
+* Updated the default template and some bits and pieces of internal code
+  to XHTML 1.1.
 * Fix the pidfile writing/unlinking in scgi_daemon.py.
 
 -------------------
