@@ -285,7 +285,10 @@ def DisplayDir(data):
 			
 			else:
 				shown = 1
-				dir_link = '%s/%s' % (Paths['current'], directory)
+				if Paths['current'] == '.':
+					dir_link = directory
+				else:
+					dir_link = '%s/%s' % (Paths['current'], directory)
 			
 			dir_desc = directory.replace('_', ' ')
 			
@@ -331,7 +334,8 @@ def DisplayDir(data):
 				extra = '<span>%s</span>' % (image_size)
 				extras.append(extra)
 			
-			extra = '<br>'.join(extras)
+			if extras:
+				extra = '<br>' + '<br>'.join(extras)
 			
 			# Build the line and keep it for later
 			line = \
@@ -524,7 +528,7 @@ div.thumbnail {
 # ---------------------------------------------------------------------------
 
 def html_footer(fudgeval):
-	elapsed = '%.4fs' % (max(0.0, time.time() - Started - fudgeval))
+	elapsed = '%.3fs' % (max(0.0, time.time() - Started - fudgeval))
 	
 	print \
 """<div class="spacer"></div>
