@@ -61,9 +61,16 @@ def ExceptHook(etype, evalue, etb):
 def ShowError(text, *args):
 	if args:
 		text = text % args
-	html_header('Error!')
-	print '%s<br><br>\n' % text
-	html_footer()
+	
+	tmpl = GetTemplate('Error!')
+	
+	tmpl.extract('show_dirs')
+	tmpl.extract('show_images')
+	tmpl.extract('show_image')
+	
+	tmpl['error'] = text
+	print tmpl
+	
 	sys.exit(0)
 
 # ---------------------------------------------------------------------------
@@ -314,9 +321,10 @@ def DisplayDir(data):
 	else:
 		nicepath = '/%s' % Paths['current']
 	
-	tmpl = GetTemplate(Conf['template'], nicepath)
+	tmpl = GetTemplate(nicepath)
 	
 	# Extract stuff we don't need
+	tmpl.extract('show_error')
 	tmpl.extract('show_image')
 	
 	shown = 0
@@ -408,9 +416,10 @@ def DisplayImage(data, image_name):
 		nicepath = '/%s' % Paths['current']
 	nicepath = '%s/%s' % (nicepath, image_name)
 	
-	tmpl = GetTemplate(Conf['template'], nicepath)
+	tmpl = GetTemplate(nicepath)
 	
 	# Extract stuff we don't need
+	tmpl.extract('show_error')
 	tmpl.extract('show_dirs')
 	tmpl.extract('show_images')
 	
@@ -521,7 +530,7 @@ def Quote(s):
 
 # ---------------------------------------------------------------------------
 
-def GetTemplate(filename, title=None):
+def GetTemplate(title=None):
 	tmpl = TemplateDocument(Conf['template'])
 	
 	# Build our shiny <title>
