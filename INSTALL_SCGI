@@ -23,6 +23,9 @@ Installation
    
    <Location "/gp">
        SCGIHandler On
+       # This seems to work for Apache 1.3, or maybe just older mod_scgi
+       SCGIServer 127.0.0.1 35001
+       # And this works on Apache 2.0, or maybe just newer mod_scgi
        SCGIServer localhost:35001
    </Location>
    
