@@ -114,6 +114,8 @@ def main(env=os.environ, started=Started):
 	
 	Paths['folder_image'] = GetPaths(Conf['folder_image'])[0] or 'folder.png'
 	
+	Conf['template'] = os.path.join(os.path.dirname(SCRIPT_FILENAME), Conf['template'])
+	
 	# Work out what they're after
 	path_info = env.get('PATH_INFO', '') or '.'
 	
