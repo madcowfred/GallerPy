@@ -10,6 +10,9 @@ __version__ = '0.5.0'
 import time
 Started = time.time()
 
+import cgitb
+cgitb.enable()
+
 import os
 import re
 import sys
@@ -19,8 +22,6 @@ from gallerpy import load_config, generate_thumbnails, walk
 from yats import TemplateDocument
 
 # ---------------------------------------------------------------------------
-
-SCRIPT_NAME = os.getenv('SCRIPT_NAME')
 
 IMAGE_RE = re.compile(r'\.(gif|jpe?g|png)$')
 
@@ -72,8 +73,13 @@ def ShowError(text, *args):
 
 # ---------------------------------------------------------------------------
 
-def main():
+def main(env=os.environ, started=Started):
 	t1 = time.time()
+	
+	# We need these
+	global SCRIPT_FILENAME, SCRIPT_NAME
+	SCRIPT_FILENAME = env['SCRIPT_FILENAME']
+	SCRIPT_NAME = env['SCRIPT_NAME']
 	
 	# Some naughty globals
 	global Conf, Paths, Warnings
@@ -81,11 +87,10 @@ def main():
 	Warnings = []
 	
 	# Find our config
-	sfn = os.getenv('SCRIPT_FILENAME')
-	if sfn is None:
+	if SCRIPT_FILENAME is None:
 		ShowError('CGI environment is broken!')
 	
-	config_file = os.path.join(os.path.dirname(sfn), 'gallerpy.conf')
+	config_file = os.path.join(os.path.dirname(SCRIPT_FILENAME), 'gallerpy.conf')
 	if not os.path.isfile(config_file):
 		ShowError('config file is missing!')
 	
@@ -101,7 +106,7 @@ def main():
 	Paths['folder_image'] = GetPaths(Conf['folder_image'])[0] or 'folder.png'
 	
 	# Work out what they're after
-	path_info = os.getenv('PATH_INFO') or '.'
+	path_info = env.get('PATH_INFO', '') or '.'
 	
 	# Don't want a starting or ending seperator
 	if path_info.startswith('/'):
@@ -149,7 +154,7 @@ def main():
 		tmpl = DisplayDir(data)
 	
 	# Work out how long it took
-	elapsed = '%.3fs' % (time.time() - Started)
+	elapsed = '%.3fs' % (time.time() - started)
 	tmpl['elapsed'] = elapsed
 	
 	# If we had any warnings, add those
@@ -374,7 +379,7 @@ def DisplayImage(data, image_name):
 # ---------------------------------------------------------------------------
 # Get a (URL, local) path for something
 def GetPaths(path):
-	dsf = os.path.dirname(os.getenv('SCRIPT_FILENAME'))
+	dsf = os.path.dirname(SCRIPT_FILENAME)
 	dsn = os.path.dirname(SCRIPT_NAME)
 	
 	# Absolute path
