@@ -130,22 +130,15 @@ def main(handler=GallerPyHandler):
 	else: 
 		pid = os.fork()
 		if pid == 0:
-			pid = os.getpid()
-			#pidfile = open(pidfilename, 'w')
-			#pidfile.write(str(pid))
-			#pidfile.close()
-			try:
-				scgi_server.SCGIServer(
-					handler, host=host, port=port, max_children=max_children
-				).serve()
-			finally:
-				# grandchildren get here too, don't let them unlink the pid
-				if pid == os.getpid():
-					try:
-						os.unlink(pidfilename)
-					except OSError:
-						pass
+			pidfile = open(pidfilename, 'w')
+			pidfile.write(str(os.getpid()))
+			pidfile.close()
+			
+			scgi_server.SCGIServer(
+				handler, host=host, port=port, max_children=max_children
+			).serve()
 
+# ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
 	main()
