@@ -45,6 +45,8 @@ def main():
 		else:
 			Conf[option] = c.get('options', option)
 	
+	Conf['hide_dirs'] = Conf['hide_dirs'].split('|')
+	
 	del c
 	
 	started = time.time()
@@ -69,8 +71,9 @@ def main():
 	made = 0
 	
 	for root, dirs, files in os.walk(walkdir):
-		if 'thumbs' in dirs:
-			dirs.remove('thumbs')
+		for hide in Conf['hide_dirs']:
+			if hide in dirs:
+				dirs.remove(hide)
 		
 		if root == walkdir:
 			continue
