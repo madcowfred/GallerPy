@@ -1,4 +1,11 @@
 -------------------
+0.5.1    2004-12-08
+-------------------
+* Update INSTALL_SCGI to try and make it slightly more understandable.
+* Add a 'sort_alphabetically' option, see gallerpy.conf for details.
+* Fix non-lowercase extension image display.
+
+-------------------
 0.5.0    2004-12-07
 -------------------
 * Added 'use_resized' and 'resized_width'/'resized_height' options

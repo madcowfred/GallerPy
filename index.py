@@ -53,7 +53,7 @@ from yats import TemplateDocument
 import dircache
 CACHE = {}
 
-IMAGE_RE = re.compile(r'\.(gif|jpe?g|png)$')
+IMAGE_RE = re.compile(r'\.(gif|jpe?g|png)$', re.I)
 
 # ---------------------------------------------------------------------------
 # Spit out a traceback in a sane manner
@@ -193,6 +193,10 @@ def main(env=os.environ, started=Started):
 	
 	t3 = time.time()
 	
+	squishy = open('/tmp/squishy.log', 'w')
+	squishy.write('image_name: %s\n' % image_name)
+	squishy.write('path_info: %s\n' % path_info)
+	
 	# If we have an image name, try to display it
 	if image_name:
 		tmpl = DisplayImage(data, image_name)
@@ -247,7 +251,13 @@ def UpdateThumbs(image_name):
 	
 	# Get a sorted list of filenames
 	lfiles = list(files)
-	lfiles.sort()
+	if Conf['sort_alphabetically']:
+		temp = [(f.lower(), f) for f in lfiles]
+		temp.sort()
+		lfiles = [f[1] for f in temp]
+		del temp
+	else:
+		lfiles.sort()
 	
 	# Initialise the data structure
 	data = {
