@@ -47,7 +47,17 @@ SCRIPT_NAME = os.getenv('SCRIPT_NAME')
 # Spit out a traceback in a sane manner
 def ExceptHook(etype, evalue, etb):
 	html_header('Error!')
-	print traceback.format_exception(etype, evalue, etb)
+	
+	print '<pre>'
+	print 'Traceback (most recent call last):'
+	
+	for entry in traceback.extract_tb(etb):
+		print '  File "%s", line %d, in %s' % entry[:-1]
+		print '    %s' % entry[-1]
+	
+	for line in traceback.format_exception_only(etype, evalue):
+		print line.replace('\n', '')
+	
 	html_footer()
 	sys.exit(0)
 
