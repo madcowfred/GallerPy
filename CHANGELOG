@@ -4,6 +4,11 @@
 * Update INSTALL_SCGI to try and make it slightly more understandable.
 * Add a 'sort_alphabetically' option, see gallerpy.conf for details.
 * Fix non-lowercase extension image display.
+* Fix SCGI caching logic to actually work properly.
+* Fix ShowError calling sys.exit, which would kill the scgi_daemon
+  process.. trashing our cache.
+* Remove the temporary logging code I left in. You'll probably want
+  to delete /tmp/silly.log and /tmp/squishy.log if they exist.
 
 -------------------
 0.5.0    2004-12-07
