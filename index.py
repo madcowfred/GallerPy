@@ -23,6 +23,9 @@ from yats import TemplateDocument
 
 # ---------------------------------------------------------------------------
 
+import dircache
+CACHE = {}
+
 IMAGE_RE = re.compile(r'\.(gif|jpe?g|png)$')
 
 # ---------------------------------------------------------------------------
@@ -174,15 +177,24 @@ def main(env=os.environ, started=Started):
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
 def UpdateThumbs(image_name):
+	# Ask dircache for a list of files
+	files = dircache.listdir(Paths['current'])
+	
+	if Paths['current'] in CACHE:
+		if files is CACHE[Paths['current']][0]:
+			return CACHE[Paths['current']][1]
+	
+	CACHE[Paths['current']] = [files,]
+	
+	# Get a sorted list of filenames
+	files = list(files)
+	files.sort()
+	
 	# Initialise the data structure
 	data = {
 		'dirs': [],
 		'images': [],
 	}
-	
-	# Get a sorted list of filenames
-	files = os.listdir(Paths['current'])
-	files.sort()
 	
 	if Paths['current'] == '.':
 		try:
@@ -212,6 +224,7 @@ def UpdateThumbs(image_name):
 	Warnings.extend(warnings)
 	
 	# Throw the info back
+	CACHE[Paths['current']].append(data)
 	return data
 
 # ---------------------------------------------------------------------------

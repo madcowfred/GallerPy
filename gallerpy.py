@@ -62,7 +62,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 		
 		# Work out our thumbnail filename
 		b64 = base64.encodestring(froot).replace('\n', '')
-		thumb_name = '%s.%s' % (b64, fext)
+		thumb_name = '%s%s' % (b64, fext)
 		thumb_path = os.path.join(Conf['thumbs_local'], thumb_name)
 		
 		# If it exists and is old, delete it

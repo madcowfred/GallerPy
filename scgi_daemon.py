@@ -56,6 +56,7 @@ class GallerPyHandler(scgi_server.SCGIHandler):
 		except IOError:
 			pass
 
+# ---------------------------------------------------------------------------
 
 def main(handler=GallerPyHandler):
 	usage = """Usage: %s [options]
