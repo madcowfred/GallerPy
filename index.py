@@ -241,11 +241,12 @@ def UpdateThumbs(image_name):
 			images.append([filename, image_file, root, ext])
 	
 	# If they want just a single image, we only have to update 1-3 thumbs
+	only_update = []
 	if image_name:
 		try:
 			n = images.index(image_name)
 		except ValueError:
-			only_update = []
+			pass
 		else:
 			if n > 0:
 				only_update = images[n-1:n+2]
