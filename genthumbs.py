@@ -77,13 +77,13 @@ def main():
 			if hide in dirs:
 				dirs.remove(hide)
 		
+		dirs.sort()
+		files.sort()
+		
 		if root == walkdir:
 			continue
 		
 		print '> Entering %s' % (root[walklen:])
-		
-		dirs.sort()
-		files.sort()
 		
 		for filename in files:
 			image_file = os.path.join(root, filename)
