@@ -264,6 +264,8 @@ def UpdateThumbs(image_name):
 def DisplayDir(data):
 	shown = 0
 	
+	t1 = time.time()
+	
 	# If we have some dirs, display them
 	if data['dirs']:
 		# Use a dictionary for speedy lookup
@@ -293,6 +295,8 @@ def DisplayDir(data):
 			print \
 """<div class="folder"><a href="%s/%s"><img src="%s" alt="folder"><br>%s</a></div>""" % (
 	SCRIPT_NAME, dir_link, Paths['folder_image'], dir_desc)
+	
+	t2 = time.time()
 	
 	# If we have some images, display those
 	if data['images']:
@@ -340,8 +344,12 @@ def DisplayDir(data):
 			
 			lines.append(line)
 		
+		t3 = time.time()
+		
 		if lines:
 			print '\n'.join(lines)
+		
+		print 't1: %.3fs - t2: %.3fs - t3: %.3fs<br>\n' % (t2-t1, t3-t2, time.time()-t3)
 
 # ---------------------------------------------------------------------------
 # Display an image page
