@@ -52,7 +52,7 @@ def main():
 		
 		print '> Entering %s' % (root[walklen:])
 		
-		newthumbs, images, warnings = generate_thumbnails(Conf, root, files, sizes=0)
+		newthumbs, _, _, warnings = generate_thumbnails(Conf, root, files, sizes=0)
 		for warning in warnings:
 			print warning
 		
