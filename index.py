@@ -61,7 +61,7 @@ def ShowError(text, *args):
 	if args:
 		text = text % args
 	html_header('Error!')
-	print text
+	print '%s<br><br>\n' % text
 	html_footer()
 	sys.exit(0)
 
@@ -88,6 +88,12 @@ def main():
 		else:
 			Conf[option] = c.get('options', option)
 	
+	# Use a dictionary for speedy lookup of hidden stuff?
+	hide = {}
+	for h in Conf.get('hide_dirs', '').split('|'):
+		hide[h] = 1
+	Conf['hide_dirs'] = hide
+	
 	del c
 	
 	# Work out some paths
@@ -107,18 +113,26 @@ def main():
 	# Work out what they're after
 	path_info = os.getenv('PATH_INFO') or '.'
 	
-	# Don't want a starting seperator
-	if path_info.startswith(os.sep):
-		path_info = path_info[len(os.sep):]
+	# Don't want a starting or ending seperator
+	if path_info.startswith('/'):
+		path_info = path_info[1:]
 	
-	# If there's an image on the end, we wants it
+	if path_info.endswith('/'):
+		path_info = path_info[:-1]
+	
+	# If there's an image on the end, we want it
 	image_name = None
 	
 	bits = os.path.split(path_info)
 	m = IMAGE_RE.match(bits[-1])
 	if m:
-		image_name = bits[-1]
-		path_info = os.path.join(*bits[:-1]) or '.'
+		image_name = bits.pop(-1)
+		path_info = '/'.join(bits) or '.'
+	
+	# Don't let people go into hidden dirs
+	if len(bits) > 0:
+		if bits[-1] in Conf['hide_dirs']:
+			ShowError('Path does not exist: %s', path_info)
 	
 	# Check the path to make sure it's valid
 	image_dir = GetPaths(path_info)[1]
@@ -296,14 +310,9 @@ def DisplayDir(data):
 	
 	# If we have some dirs, display them
 	if data['dirs']:
-		# Use a dictionary for speedy lookup
-		hidden = {}
-		for h in Conf.get('hide_dirs', '').split('|'):
-			hidden[h] = 1
-		
 		for directory in data['dirs']:
 			# Skip hidden dirs
-			if directory in hidden:
+			if directory in Conf['hide_dirs']:
 				continue
 			
 			# Parent dir
@@ -600,8 +609,8 @@ if __name__ == '__main__':
 	try:
 		#pass
 		import psyco
-		psyco.bind(DisplayDir)
-		psyco.bind(UpdateThumbs)
+		#Psyco.bind(DisplayDir)
+		Psyco.bind(UpdateThumbs)
 		psyco.bind(JpegImagePlugin.JpegImageFile._open)
 	except:
 		pass
