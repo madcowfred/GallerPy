@@ -44,10 +44,10 @@ IMAGE_RE = re.compile(r'^(.*)\.(gif|jpe|jpg|jpeg|png)$', re.I)
 SCRIPT_NAME = os.getenv('SCRIPT_NAME')
 
 # ---------------------------------------------------------------------------
-
+# Spit out a traceback in a sane manner
 def ExceptHook(etype, evalue, etb):
 	html_header('Error!')
-	traceback.print_exception(etype, evalue, etb)
+	print traceback.format_exception(etype, evalue, etb)
 	html_footer()
 	sys.exit(0)
 
