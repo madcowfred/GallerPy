@@ -13,6 +13,9 @@ def main():
 	# Parse our config
 	Conf = load_config('gallerpy.conf')
 	
+	if 'thumbs_local' not in Conf:
+		Conf['thumbs_local'] = 'thumbs'
+	
 	started = time.time()
 	
 	# Work out where we're going

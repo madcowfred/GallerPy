@@ -36,11 +36,6 @@ def load_config(filepath):
 		if Conf[option].isdigit():
 			Conf[option] = int(Conf[option])
 	
-	if 'thumbs_local' not in Conf:
-		Conf['thumbs_local'] = 'thumbs'
-	if 'thumbs_web' not in Conf:
-		Conf['thumbs_web'] = 'thumbs'
-	
 	Conf['hide_dirs'] = Conf['hide_dirs'].split('|')
 	
 	return Conf
