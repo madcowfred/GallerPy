@@ -3,7 +3,7 @@
 'A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.'
 
 __author__ = 'freddie@madcowdisease.org'
-__version__ = '0.3.0'
+__version__ = '0.3'
 
 # ---------------------------------------------------------------------------
 # We need to know when we started for later
