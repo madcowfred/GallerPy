@@ -123,7 +123,7 @@ def main():
 	# If there's an image on the end, we want it
 	image_name = None
 	
-	bits = os.path.split(path_info)
+	bits = list(os.path.split(path_info))
 	m = IMAGE_RE.match(bits[-1])
 	if m:
 		image_name = bits.pop(-1)
