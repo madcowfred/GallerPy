@@ -43,7 +43,7 @@ Installation
    $ chmod 755 index.py    (executable, so it works)
 
 
-5. Test it out! If you get a 500 Interal server error, try running index.py
+6. Test it out! If you get a 500 Interal server error, try running index.py
    from the command line:
    
    $ python index.py

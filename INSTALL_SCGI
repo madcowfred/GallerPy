@@ -1,0 +1,31 @@
+Requirements
+------------
+* SCGI (http://www.mems-exchange.org/software/scgi/)
+
+
+Installation
+------------
+1. I assume you already have GallerPy working as a CGI, so I'll just list the
+   steps to adjust it for SCGI here.
+
+
+2. You need to install mod_scgi and the scgi Python module. If you're using
+   FreeBSD, try /usr/ports/www/mod_scgi and /usr/ports/www/py-scgi. If you're
+   not, read the docs in the SCGI distribution!
+
+
+3. Run "python scgi_daemon.py -Zhfjahd" so it prints the usage information, you
+   might want to change the port and so on. Then run it with your selected options
+   and -F, so you can see if it blows up.
+
+
+4. In your Apache config, you need to add something like this:
+   
+   <Location "/gp">
+       SCGIHandler On
+       SCGIServer localhost:35001
+   </Location>
+
+
+5. That's it. Assuming your image files are in the GallerPy directory, your shiny
+   new SCGI server should Just Work(tm).
