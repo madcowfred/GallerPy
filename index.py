@@ -179,6 +179,12 @@ def UpdateThumbs(image_name):
 	files = os.listdir(Paths['current'])
 	files.sort()
 	
+	if Paths['current'] == '.':
+		try:
+			files.remove(Conf['folder_image'])
+		except ValueError:
+			pass
+	
 	# If they want just a single image, we only have to update 1-3 thumbs
 	if image_name:
 		try:
