@@ -1,0 +1,71 @@
+body {
+	color: #FFFFFF;
+	background: #006699;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 80%;
+}
+td {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 80%;
+}
+a {
+	color: #FFFFAA;
+	background: transparent;
+	text-decoration: none;
+}
+img {
+	border: 0;
+}
+
+div.container {
+	margin: 0px;
+	padding: 6px 0px 0px 0px;
+	border-bottom: 2px dotted #CCC;
+}
+div.container > table {
+	padding-bottom: 5px;
+}
+div.imagetop {
+	margin: 0px auto 0px auto;
+	border-bottom: 2px dotted #CCC;
+	text-align: center;
+	vertical-align: top;
+	background: #444;
+}
+div.spacer {
+	clear: both;
+}
+
+div.folder {
+	float: left;
+	width: 110px;
+	height: 85px;
+	padding: 3px 3px 0px 3px;
+	text-align: center;
+}
+
+div.image {
+	text-align: center;
+	padding: 3px 0px 5px 0px;
+}
+div.image > h2 {
+	font-family: Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	font-size: 140%;
+	margin: 0px 0px 0px 0px;
+}
+div.image > img {
+	margin-top: 8px;
+}
+
+span {
+	color: #FFCC88;
+	font-size: 75%;
+}	
+
+p.footer {
+	text-align: right;
+	font-size: 90%;
+	padding: 4px;
+	margin: 0px;
+}
