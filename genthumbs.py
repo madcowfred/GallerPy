@@ -149,9 +149,8 @@ def main():
 				made += 1
 	
 	# Done
-	now = time.time()
 	print
-	print 'Generated %d thumbnails in %.1fs' % (made, now - started)
+	print 'Generated %d thumbnails in %.1fs' % (made, time.time() - started)
 	
 	# Now clean up any missing thumbs
 	killed = 0
@@ -165,7 +164,7 @@ def main():
 			killed += 1
 	
 	if killed:
-		print 'Removed %d stale thumbnails in %.1fs' % (killed, time.time() - now)
+		print 'Removed %d stale thumbnails' % (killed)
 
 # ---------------------------------------------------------------------------
 
