@@ -22,45 +22,46 @@ div.thumbnail {
 
 <!--{show_error}-->
 <div class="container">
-{error}
-<br><br>
+  {error}
+  <br><br>
 </div>
 <!--{show_error}-->
 
 <!--{show_dirs}-->
 <div class="container">
-<div class="spacer"></div>
+  <div class="spacer"></div>
 <!--{dirs}-->
-<div class="folder"><a href="{dir_link}"><img src="{folder_img}" alt="folder"><br>{dir_desc}</a></div>
+  <div class="folder"><a href="{dir_link}"><img src="{folder_img}" alt="folder"><br>{dir_desc}</a></div>
 <!--{dirs}-->
-<div class="spacer"></div>
+  <div class="spacer"></div>
 </div>
 <!--{show_dirs}-->
 
 <!--{show_images}-->
 <div class="container">
-<div class="spacer"></div>
+  <div class="spacer"></div>
 <!--{images}-->
-<div class="thumbnail"><a href="{image_link}"><img src="{thumb_img}" {thumb_params}></a>{extra}</div>
+  <div class="thumbnail"><a href="{image_link}"><img src="{thumb_img}" {thumb_params}></a>{extra}</div>
 <!--{images}-->
-<div class="spacer"></div>
+  <div class="spacer"></div>
 </div>
 <!--{show_images}-->
 
 <!--{show_image}-->
 <div class="container">
-<table border="0" cellpadding="0" cellspacing="0" align="center">
-<tr>
-<td width="300" valign="bottom" align="center">{prevlink}</td>
-<td width="100" valign="bottom" align="center"><a href="{dir_path}"><img src="{folder_img}" alt="folder"><br>Back</a></td>
-<td width="300" valign="bottom" align="center">{nextlink}</td>
-</tr>
-</table>
+  <table border="0" cellpadding="0" cellspacing="0" align="center">
+    <tr>
+      <td width="300" valign="bottom" align="center">{prevlink}</td>
+      <td width="100" valign="bottom" align="center"><a href="{dir_path}"><img src="{folder_img}" alt="folder"><br>Back</a></td>
+      <td width="300" valign="bottom" align="center">{nextlink}</td>
+    </tr>
+  </table>
 </div>
 
 <div class="container">
-<div class="image">
-{extra}{this_img}
+  <div class="image">
+    {extra}{this_img}
+  </div>
 </div>
 <!--{show_image}-->
 
