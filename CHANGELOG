@@ -1,12 +1,19 @@
 -------------------
-0.3      2004-04-17
+0.4.0    2004-11-12
+-------------------
+* First public release!
+* genthumbs.py will now remove any stale thumbnails after it's finished
+  generating.
+
+-------------------
+0.3.0    2004-04-17
 -------------------
 * Change all of the HTML generation code to use a simple template for
   display instead of littering it all around the code.
 * Add error handling for image files that aren't openable.
 
 -------------------
-0.2      2004-04-13
+0.2.0    2004-04-13
 -------------------
 * Change the config file so it's read from gallerpy.conf in the current
   directory.
@@ -15,5 +22,5 @@
   issue with going into thumbs, oops :)
 
 -------------------
-0.1      2004-04-12
+0.1.0    2004-04-12
 -------------------
