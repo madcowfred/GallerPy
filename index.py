@@ -11,11 +11,12 @@ import time
 Started = time.time()
 
 import base64
-import Image
 import os
 import re
 import sys
 import traceback
+
+import Image
 
 from ConfigParser import ConfigParser
 from yats import TemplateDocument
