@@ -77,9 +77,10 @@ def ShowError(text, *args):
 
 def main():
 	# Some naughty globals
-	global Conf, Paths
+	global Conf, Paths, Warnings
 	Conf = {}
 	Paths = {}
+	Warnings = []
 	
 	# Find our config
 	config_file = os.path.join(os.path.dirname(os.getenv('SCRIPT_FILENAME')), 'gallerpy.conf')
@@ -114,9 +115,6 @@ def main():
 			ShowError("Can't find your thumbnail directory!")
 	
 	Paths['folder_image'] = GetPaths(Conf['folder_image'])[0] or 'folder.png'
-	
-	#for k, v in os.environ.items():
-	#	print '%s == %s<br>' % (k, v)
 	
 	# Work out what they're after
 	path_info = os.getenv('PATH_INFO') or '.'
@@ -153,7 +151,6 @@ def main():
 	
 	# Now that we've done all that, update the thumbnails
 	data = UpdateThumbs(image_name)
-	#print 'UpdateThumbs: %.5fs<br>' % (time.time() - Started)
 	
 	# If we have an image name, try to display it
 	if image_name:
@@ -166,6 +163,12 @@ def main():
 	# Work out how long it took
 	elapsed = '%.3fs' % (time.time() - Started)
 	tmpl['elapsed'] = elapsed
+	
+	# If we had any warnings, add those
+	if Warnings:
+		tmpl['error'] = '<br>\n'.join(Warnings)
+	else:
+		tmpl.extract('show_error')
 	
 	# And spit it out
 	print tmpl
@@ -267,7 +270,8 @@ def UpdateThumbs(image_name):
 			try:
 				img = OPEN.get(ext, Image.open)(image_file)
 			except IOError, msg:
-				print "Warning: failed to open '%s' - %s<br>\n" % (filename, msg)
+				warning = "Warning: failed to open '%s' - %s" % (filename, msg)
+				Warnings.append(warning)
 				continue
 			
 			image_width, image_height = img.size
@@ -276,7 +280,8 @@ def UpdateThumbs(image_name):
 			try:
 				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
 			except IOError, msg:
-				print "Warning: failed to resize '%s' - %s<br>\n" % (filename, msg)
+				warning = "Warning: failed to resize '%s' - %s" % (filename, msg)
+				Warnings.append(warning)
 				continue
 			
 			thumb_width, thumb_height = img.size
@@ -284,7 +289,8 @@ def UpdateThumbs(image_name):
 			try:
 				img.save(thumb_file)
 			except:
-				print 'Warning: failed to resize %s!<br>' % (filename)
+				warning = "Warning: failed to resize '%s'!<br>" % (filename)
+				Warnings.append(warning)
 				continue
 		
 		# Get some info on the image/thumbnail if we need to
@@ -309,6 +315,9 @@ def UpdateThumbs(image_name):
 		image_data = (filename, image_file, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height)
 		data['images'].append(image_data)
 	
+	# If we had any warnings, stick them into the errors thing
+	
+	
 	# Throw the info back
 	return data
 
@@ -324,7 +333,6 @@ def DisplayDir(data):
 	tmpl = GetTemplate(nicepath)
 	
 	# Extract stuff we don't need
-	tmpl.extract('show_error')
 	tmpl.extract('show_image')
 	
 	shown = 0
@@ -419,7 +427,6 @@ def DisplayImage(data, image_name):
 	tmpl = GetTemplate(nicepath)
 	
 	# Extract stuff we don't need
-	tmpl.extract('show_error')
 	tmpl.extract('show_dirs')
 	tmpl.extract('show_images')
 	
