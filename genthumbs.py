@@ -1,54 +1,17 @@
 #!/usr/bin/env python
 
-from __future__ import generators
-
 import base64
 import os
-import re
 import sys
 import time
 
-sys.path.append(os.path.expanduser('~/lib/python/PIL'))
-
-from ConfigParser import ConfigParser
-
-import Image
-
-# Faster way to make images load :|
-import GifImagePlugin
-import JpegImagePlugin
-import PngImagePlugin
-
-OPEN = {
-	'gif': GifImagePlugin.GifImageFile,
-	'jpe': JpegImagePlugin.JpegImageFile,
-	'jpg': JpegImagePlugin.JpegImageFile,
-	'jpeg': JpegImagePlugin.JpegImageFile,
-	'png': PngImagePlugin.PngImageFile,
-}
-
-# ---------------------------------------------------------------------------
-
-IMAGE_RE = re.compile(r'^(.*)\.(gif|jpe|jpg|jpeg|png)$', re.I)
+from gallerpy import load_config, generate_thumbnails, walk
 
 # ---------------------------------------------------------------------------
 
 def main():
 	# Parse our config
-	Conf = {}
-	
-	c = ConfigParser()
-	c.read('gallerpy.conf')
-	
-	for option in c.options('options'):
-		if option.startswith('thumb_') or option.startswith('image_'):
-			Conf[option] = int(c.get('options', option))
-		else:
-			Conf[option] = c.get('options', option)
-	
-	Conf['hide_dirs'] = Conf['hide_dirs'].split('|')
-	
-	del c
+	Conf = load_config('gallerpy.conf')
 	
 	started = time.time()
 	
@@ -86,67 +49,11 @@ def main():
 		
 		print '> Entering %s' % (root[walklen:])
 		
-		for filename in files:
-			image_file = os.path.join(root, filename)
-			image_name = image_file[walklen:]
-			
-			# We only want images
-			m = IMAGE_RE.match(image_name)
-			if not m:
-				continue
-			
-			froot = m.group(1)
-			fext = m.group(2).lower()
-			
-			# Work out our goofy thumbnail name
-			b64 = base64.encodestring(froot).replace('\n', '')
-			thumb_name = '%s.%s' % (b64, fext)
-			thumb_file = os.path.join(thumb_path, thumb_name)
-			
-			# If it exists and is old, delete it
-			image_stat = os.stat(image_file)
-			try:
-				thumb_stat = os.stat(thumb_file)
-			except OSError:
-				gen_thumb = 1
-			else:
-				if image_stat.st_mtime > thumb_stat.st_mtime:
-					try:
-						os.remove(thumb_file)
-					except OSError:
-						continue
-					else:
-						gen_thumb = 1
-				else:
-					gen_thumb = 0
-			
-			# Make a new thumbnail now
-			if gen_thumb:
-				print '-> Thumbnailing %s...' % (filename),
-				sys.stdout.flush()
-				
-				# Open it
-				img = OPEN.get(fext, Image.open)(image_file)
-				image_width, image_height = img.size
-				
-				# Resize and save it
-				try:
-					img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), Image.BICUBIC)
-				except IOError, msg:
-					print 'failed: %s' % msg
-					continue
-				
-				thumb_width, thumb_height = img.size
-				
-				try:
-					img.save(thumb_file)
-				except Exception, msg:
-					print 'failed: %s' % (msg)
-					continue
-				
-				print 'OK.'
-				
-				made += 1
+		newthumbs, images, warnings = generate_thumbnails(Conf, root, files, sizes=0)
+		for warning in warnings:
+			print warning
+		
+		made += newthumbs
 	
 	# Done
 	print
@@ -165,45 +72,8 @@ def main():
 	
 	if killed:
 		print 'Removed %d stale thumbnails' % (killed)
-
-# ---------------------------------------------------------------------------
-# Borrowed from Python 2.3's os module since it doesn't exist in 2.2
-def walk(top):
-	from os.path import join, isdir, islink, normpath
 	
-	try:
-		names = os.listdir(top)
-	except OSError:
-		return
-	
-	dirs, nondirs = [], []
-	for name in names:
-		topname = join(top, name)
-		
-		if isdir(topname):
-			dirs.append(name)
-		elif islink(topname) and isdir(normpath(topname)):
-			dirs.append(name)
-		else:
-			nondirs.append(name)
-	
-	yield top, dirs, nondirs
-	
-	for name in dirs:
-		path = join(top, name)
-		#if not islink(path):
-		for x in walk(path):
-			yield x
-
 # ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
-	# Useful speedup
-	try:
-		import psyco
-		psyco.bind(main)
-		psyco.bind(JpegImagePlugin.JpegImageFile._open)
-	except ImportError:
-		pass
-	
 	main()
