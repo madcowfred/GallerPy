@@ -594,9 +594,6 @@ if __name__ == '__main__':
 	except:
 		pass
 	
-	#import profile
-	#profile.run('main()', 'profile.data')
-	
 	SentHeader = 0
 	SentFooter = 0
 	
