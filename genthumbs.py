@@ -78,7 +78,7 @@ def main():
 		if root == walkdir:
 			continue
 		
-		print '> Entering %s' % (root)
+		print '> Entering %s' % (root[walklen:])
 		
 		dirs.sort()
 		files.sort()
