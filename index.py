@@ -181,6 +181,10 @@ def UpdateThumbs(image_name):
 		if os.path.isdir(image_file):
 			data['dirs'].append(filename)
 		
+		# It's our folder image, nooo
+		elif Paths['current'] == '.' and filename == Conf['folder_image']:
+			continue
+		
 		else:
 			# It's not an image format we know about
 			m = IMAGE_RE.match(image_file)
