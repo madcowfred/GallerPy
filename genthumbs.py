@@ -68,7 +68,7 @@ def main():
 		root, ext = os.path.splitext(filename)
 		decoded = '%s%s' % (base64.decodestring(root).replace('\n', ''), ext)
 		
-		if not os.path.exists(decoded):
+		if not os.path.exists(decoded) or decoded.startswith(os.sep):
 			filepath = os.path.join(thumb_path, filename)
 			os.remove(filepath)
 			killed += 1
