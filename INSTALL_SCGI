@@ -15,8 +15,8 @@ Installation
 
 
 3. Run "python scgi_daemon.py -Zhfjahd" so it prints the usage information, you
-   might want to change the port and so on. Then run it with your selected options
-   and -F, so you can see if it blows up.
+   might want to change the port and so on. Then just run it with whatever
+   options you feel like using.
 
 
 4. In your Apache config, you need to add something like this:
@@ -25,6 +25,10 @@ Installation
        SCGIHandler On
        SCGIServer localhost:35001
    </Location>
+   
+   If the GallerPy code lives in "/gallery/", for instance, you need to change the
+   Location to "/gallery/gp". You'll also need to open up scgi_daemon.py, find the
+   "prefix = '/gp'" line and change the path to '/gallery/gp' (or whatever).
 
 
 5. That's it. Assuming your image files are in the GallerPy directory, your shiny
