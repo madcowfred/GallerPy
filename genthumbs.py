@@ -6,7 +6,7 @@ import re
 import sys
 import time
 
-sys.path.append(os.path.expanduser('~/lib/python'))
+sys.path.append(os.path.expanduser('~/lib/python/PIL'))
 
 from ConfigParser import ConfigParser
 from index import CONFIG_FILE
