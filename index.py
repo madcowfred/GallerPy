@@ -454,14 +454,6 @@ if __name__ == '__main__':
 	# Replace our exception handler with a magic one
 	sys.excepthook = ExceptHook
 	
-	# Useful speedup
-	#try:
-	#	import psyco
-	#	psyco.bind(UpdateThumbs)
-	#	psyco.bind(JpegImagePlugin.JpegImageFile._open)
-	#except ImportError:
-	#	pass
-	
 	SentHeader = 0
 	SentFooter = 0
 	
