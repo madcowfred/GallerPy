@@ -104,16 +104,14 @@ def main():
 	c.read(config_file)
 	
 	for option in c.options('options'):
-		if option.startswith('thumb_') or option.startswith('image_'):
-			Conf[option] = int(c.get('options', option))
-		else:
-			Conf[option] = c.get('options', option)
+		Conf[option] = c.get('options', option)
+		if Conf[option].isdigit():
+			Conf[option] = int(Conf[option])
 	
 	# Use a dictionary for speedy lookup of hidden stuff?
-	hide = {}
+	Conf['hide_dirs'] = {}
 	for h in Conf.get('hide_dirs', '').split('|'):
-		hide[h] = 1
-	Conf['hide_dirs'] = hide
+		Conf['hide_dirs'][h] = 1
 	
 	del c
 	
