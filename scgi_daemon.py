@@ -33,16 +33,13 @@ class GallerPyHandler(scgi_server.SCGIHandler):
 		env['SCRIPT_FILENAME'] = sys.argv[0]
 		env['SCRIPT_NAME'] = self.prefix
 		
-		# Do stuff here
+		# Test
 		if 0:
 			print 'Content-type: text/plain'
 			print
-			print 'moo'
 			
 			for k, v in env.items():
 				print k, '==>', v
-			
-			print 'baa'
 		
 		# Show the page
 		if 1:
@@ -100,7 +97,6 @@ def main(handler=GallerPyHandler):
 	os.close(0)
 	
 	if nofork:
-		print 'serving'
 		scgi_server.SCGIServer(
 			handler, host=host, port=port, max_children=max_children
 		).serve() 
