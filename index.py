@@ -244,7 +244,7 @@ def UpdateThumbs(image_name):
 	if image_name:
 		try:
 			n = images.index(image_name)
-		except ValueError
+		except ValueError:
 			only_update = []
 		else:
 			if n > 0:
