@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2.3
 
 """
 Script to run from crontab to make sure your various SCGI processes are
@@ -43,13 +43,13 @@ CHECKME = (
 		'pidfile': '/home/freddie/scgi/test.pid',
 		'logfile': '/home/freddie/scgi/test.log',
 		'path': '/home/freddie/www/test.home',
-		'command': 'python scgi_daemon.py -P %(pidfile)s -L %(logfile)s',
+		'command': '/usr/bin/python2.3 scgi_daemon.py -P %(pidfile)s -L %(logfile)s',
 	},
 	{
 		'pidfile': '/home/freddie/scgi/test2.pid',
 		'logfile': '/home/freddie/scgi/test2.log',
 		'path': '/home/freddie/www/test2.home',
-		'command': 'python scgi_daemon.py -P %(pidfile)s -L %(logfile)s',
+		'command': '/usr/bin/python2.3 scgi_daemon.py -P %(pidfile)s -L %(logfile)s',
 	},
 )
 
