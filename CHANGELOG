@@ -1,5 +1,5 @@
 -------------------
-0.5.0    2004-12-??
+0.5.0    2004-12-07
 -------------------
 * Added 'use_resized' and 'resized_width'/'resized_height' options
 * Split most of the interesting code into gallerpy.py, it makes no sense
@@ -10,6 +10,8 @@
   be around 10x :) See INSTALL_SCGI for some bad instructions on using it.
 * Added an option to set the image resize method. See sample.conf for
   details.
+* Try to find the template relative to the script path. This should help
+  if someone is crazy enough to try embedding GallerPy into something.
 
 -------------------
 0.4.0    2004-11-12
