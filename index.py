@@ -3,7 +3,7 @@
 'A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.'
 
 __author__ = 'freddie@madcowdisease.org'
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 # ---------------------------------------------------------------------------
 # We need to know when we started for later
@@ -18,6 +18,7 @@ import sys
 import traceback
 
 from ConfigParser import ConfigParser
+from yats import TemplateDocument
 
 # Faster way to make images load :|
 import GifImagePlugin
@@ -139,6 +140,7 @@ def main():
 	if image_dir is None:
 		ShowError('Path does not exist: %s', path_info)
 	
+	
 	# We need to know what the current dir is
 	Paths['current'] = path_info or '.'
 	
@@ -148,16 +150,18 @@ def main():
 	
 	# If we have an image name, try to display it
 	if image_name:
-		fudgeval = DisplayImage(data, image_name)
+		tmpl = DisplayImage(data, image_name)
 	
 	# Or we could just display the directory
 	else:
-		fudgeval = DisplayDir(data)
+		tmpl = DisplayDir(data)
 	
-	#print 'Display: %.5fs' % (time.time() - Started)
+	# Work out how long it took
+	elapsed = '%.3fs' % (time.time() - Started)
+	tmpl['elapsed'] = elapsed
 	
-	# Spit out a footer
-	html_footer(fudgeval)
+	# And spit it out
+	print tmpl
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
@@ -304,16 +308,22 @@ def UpdateThumbs(image_name):
 # ---------------------------------------------------------------------------
 # Spit out a nicely formatted listing of a directory
 def DisplayDir(data):
-	# Spit out a header
+	# Get our template
 	if Paths['current'] == '.':
 		nicepath = '/'
 	else:
 		nicepath = '/%s' % Paths['current']
-	html_header(nicepath)
+	
+	tmpl = GetTemplate(Conf['template'], nicepath)
+	
+	# Extract stuff we don't need
+	tmpl.extract('show_image')
 	
 	shown = 0
 	
 	# If we have some dirs, display them
+	dirs = []
+	
 	if data['dirs']:
 		for directory in data['dirs']:
 			# Skip hidden dirs
@@ -334,34 +344,25 @@ def DisplayDir(data):
 				else:
 					dir_link = '%s/%s' % (Paths['current'], directory)
 			
-			dir_desc = directory.replace('_', ' ')
+			row = {
+				'dir_desc': directory.replace('_', ' '),
+				'dir_link': '%s/%s' % (SCRIPT_NAME, dir_link),
+				'folder_img': Paths['folder_image'],
+			}
 			
-			# Spit it out
-			print \
-"""<div class="folder"><a href="%s/%s"><img src="%s" alt="folder"><br>%s</a></div>""" % (
-	SCRIPT_NAME, dir_link, Paths['folder_image'], dir_desc)
+			dirs.append(row)
+	
+	tmpl['dirs'] = tuple(dirs)
+	if not dirs:
+		tmpl.extract('show_dirs')
+	
 	
 	# If we have some images, display those
+	images = []
+	
 	if data['images']:
-		# If we spat out some dirs, put a seperator in
-		if shown:
-			print \
-"""
-<div class="spacer"></div>
-</div>
-<div class="container">
-<div class="spacer"></div>
-"""
-		
-		# Lines we want to print
-		lines = []
-		
-		# Save on function lookups
-		_quote = Quote
-		_tip = ThumbImgParams
 		for image_name, image_file, image_size, image_width, image_height, thumb_name, thumb_width, thumb_height in data['images']:
-			# Work out the <img> parameters
-			img_params = _tip(thumb_width, thumb_height)
+			row = {}
 			
 			# Maybe add some extra stuff
 			parts = []
@@ -378,21 +379,20 @@ def DisplayDir(data):
 				part = '<br><span>%s</span>' % (image_size)
 				parts.append(part)
 			
-			extra = ''.join(parts)
+			row['extra'] = ''.join(parts)
 			
-			# Build the line and keep it for later
-			line = \
-"""<div class="thumbnail"><a href="%s/%s"><img src="%s/%s" %s></a>%s</div>""" % (
-	SCRIPT_NAME, _quote(image_file), Paths['thumbs_web'], thumb_name, img_params, extra)
+			row['image_link'] = '%s/%s' % (SCRIPT_NAME, Quote(image_file))
 			
-			lines.append(line)
-		
-		t = time.time()
-		
-		if lines:
-			print '\n'.join(lines)
-		
-		return time.time() - t
+			row['thumb_img'] = '%s/%s' % (Paths['thumbs_web'], thumb_name)
+			row['thumb_params'] = ThumbImgParams(thumb_width, thumb_height)
+			
+			images.append(row)
+	
+	tmpl['images'] = tuple(images)
+	if not images:
+		tmpl.extract('show_images')
+	
+	return tmpl
 
 # ---------------------------------------------------------------------------
 # Display an image page
@@ -402,13 +402,17 @@ def DisplayImage(data, image_name):
 	if not matches:
 		ShowError('file does not exist!')
 	
-	# Spit out a header
 	if Paths['current'] == '.':
 		nicepath = '/'
 	else:
 		nicepath = '/%s' % Paths['current']
 	nicepath = '%s/%s' % (nicepath, image_name)
-	html_header(nicepath)
+	
+	tmpl = GetTemplate(Conf['template'], nicepath)
+	
+	# Extract stuff we don't need
+	tmpl.extract('show_dirs')
+	tmpl.extract('show_images')
 	
 	# Work out the prev/next images too
 	this = matches[0]
@@ -425,7 +429,7 @@ def DisplayImage(data, image_name):
 		prev_enc = Quote(prev[0])
 		img_params = ThumbImgParams(prev[6], prev[7])
 		
-		prevlink = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
+		tmpl['prevlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
 			SCRIPT_NAME, prev[1], Paths['thumbs_web'], prev[5], img_params, prev_enc)
 	
 	# Next image
@@ -434,11 +438,11 @@ def DisplayImage(data, image_name):
 		next_enc = Quote(next[0])
 		img_params = ThumbImgParams(next[6], next[7])
 		
-		nextlink = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
+		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
 			SCRIPT_NAME, next[1], Paths['thumbs_web'], next[5], img_params, next_enc)
 	
 	# This image
-	this_img = '<img src="%s" width="%s" height="%s" alt="%s">' % (
+	tmpl['this_img'] = '<img src="%s" width="%s" height="%s" alt="%s">' % (
 		Quote(GetPaths(this[1])[0]), this[3], this[4], this[0])
 	
 	# Work out what extra info we need to display
@@ -454,27 +458,14 @@ def DisplayImage(data, image_name):
 		part = '<span>%s</span><br>\n' % (this[2])
 		parts.append(part)
 	
-	extra = ''.join(parts)
+	tmpl['extra'] = ''.join(parts)
 	
-	t = time.time()
+	tmpl['dir_path'] = '%s/%s' % (SCRIPT_NAME, Paths['current'])
+	tmpl['folder_img'] = Paths['folder_image']
 	
-	print \
-"""<table border="0" cellpadding="0" cellspacing="0" align="center">
-<tr>
-<td width="300" valign="bottom" align="center">%s</td>
-<td width="100" valign="bottom" align="center"><a href="%s/%s"><img src="%s" alt="folder"><br>Back</a></td>
-<td width="300" valign="bottom" align="center">%s</td>
-</tr>
-</table>
-</div>
-<div class="container">
-<div class="spacer"></div>
-<div class="image">
-%s%s
-</div>""" % (
-	prevlink, SCRIPT_NAME, Paths['current'], Paths['folder_image'], nextlink, extra, this_img)
+	#prevlink, SCRIPT_NAME, Paths['current'], Paths['folder_image'], nextlink, extra, this_img)
 	
-	return time.time() - t
+	return tmpl
 
 # ---------------------------------------------------------------------------
 # Get a (URL, local) path for something
@@ -530,79 +521,34 @@ def Quote(s):
 
 # ---------------------------------------------------------------------------
 
-def html_header(title=None):
-	global SentHeader
-	if SentHeader:
-		return
-	SentHeader = 1
+def GetTemplate(filename, title=None):
+	tmpl = TemplateDocument(Conf['template'])
 	
 	# Build our shiny <title>
 	gallery_name = Conf.get('gallery_name', 'GallerPy %s' % __version__)
 	
 	if title:
-		title = '%s :: %s' % (gallery_name, title)
+		tmpl['title'] = '%s :: %s' % (gallery_name, title)
 	else:
-		title = '%s' % (gallery_name)
+		tmpl['title'] = '%s' % (gallery_name)
 	
 	# Find our CSS file
 	css_file = GetPaths(Conf['css_file'])[0]
 	if css_file is None:
 		css_file = 'default.css'
+	tmpl['css_file'] = css_file
 	
 	# Work out the box size for thumbnails
-	thumb_width = Conf['thumb_width'] + 10
+	tmpl['thumb_width'] = Conf['thumb_width'] + 10
 	
 	add = (Conf['thumb_name'] + Conf['thumb_dimensions'] + Conf['thumb_size']) * 15
-	thumb_height = Conf['thumb_height'] + 15 + add
+	tmpl['thumb_height'] = Conf['thumb_height'] + 15 + add
 	
-	# Standard header
-	print 'Content-type: text/html'
-	print
+	# Our version!
+	tmpl['version'] = __version__
 	
-	# HTML junk
-	print \
-"""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<title>%s</title>
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" title="Default" href="%s">
-<style type="text/css">
-div.thumbnail {
-	float: left;
-	width: %dpx;
-	height: %dpx;
-	padding: 3px 3px 0px 3px;
-	text-align: center;
-}
-</style>
-</head>
-
-<body>
-<div class="container">
-<div class="spacer"></div>
-""" % (title, css_file, thumb_width, thumb_height)
-
-# ---------------------------------------------------------------------------
-
-def html_footer(fudgeval=None):
-	global SentFooter
-	if SentFooter:
-		return
-	SentFooter = 1
-	
-	if fudgeval is None:
-		fudgeval = 0.0
-	elapsed = '%.3fs' % (max(0.0, time.time() - Started - fudgeval))
-	
-	print \
-"""<div class="spacer"></div>
-</div>
-<p class="footer">Generated in %s by <a href="http://www.madcowdisease.org/projects.php/GallerPy">GallerPy</a> %s</p>
-</body>
-</html>
-""" % (elapsed, __version__)
+	# And send it back
+	return tmpl
 
 # ---------------------------------------------------------------------------
 

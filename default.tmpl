@@ -1,0 +1,62 @@
+Content-type: text/html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>{title}</title>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" title="Default" href="{css_file}">
+<style type="text/css">
+div.thumbnail {
+	float: left;
+	width: {thumb_width}px;
+	height: {thumb_height}px;
+	padding: 3px 3px 0px 3px;
+	text-align: center;
+}
+</style>
+</head>
+
+<body>
+<!--{show_dirs}-->
+<div class="container">
+<div class="spacer"></div>
+<!--{dirs}-->
+<div class="folder"><a href="{dir_link}"><img src="{folder_img}" alt="folder"><br>{dir_desc}</a></div>
+<!--{dirs}-->
+<div class="spacer"></div>
+</div>
+<!--{show_dirs}-->
+
+<!--{show_images}-->
+<div class="container">
+<div class="spacer"></div>
+<!--{images}-->
+<div class="thumbnail"><a href="{image_link}"><img src="{thumb_img}" {thumb_params}></a>{extra}</div>
+<!--{images}-->
+<div class="spacer"></div>
+</div>
+<!--{show_images}-->
+
+<!--{show_image}-->
+<div class="container">
+<table border="0" cellpadding="0" cellspacing="0" align="center">
+<tr>
+<td width="300" valign="bottom" align="center">{prevlink}</td>
+<td width="100" valign="bottom" align="center"><a href="{dir_path}"><img src="{folder_img}" alt="folder"><br>Back</a></td>
+<td width="300" valign="bottom" align="center">{nextlink}</td>
+</tr>
+</table>
+</div>
+
+<div class="container">
+<div class="image">
+{extra}{this_img}
+</div>
+<!--{show_image}-->
+
+<p class="footer">Generated in {elapsed} by <a href="http://www.madcowdisease.org/projects.php/GallerPy">GallerPy</a> {version}</p>
+</body>
+
+</html>
