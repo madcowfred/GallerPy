@@ -67,9 +67,9 @@ def ExceptHook(etype, evalue, etb):
 	lines = []
 	
 	for entry in traceback.extract_tb(etb):
-		line = '&nbsp;&nbsp;File "<b>%s</b>", line <b>%d</b>, in <b>%s</b><br>' % entry[:-1]
+		line = '&nbsp;&nbsp;File "<b>%s</b>", line <b>%d</b>, in <b>%s</b><br />' % entry[:-1]
 		lines.append(line)
-		line = '&nbsp;&nbsp;&nbsp;&nbsp;%s<br><br>' % entry[-1]
+		line = '&nbsp;&nbsp;&nbsp;&nbsp;%s<br /><br />' % entry[-1]
 		lines.append(line)
 	
 	for line in traceback.format_exception_only(etype, evalue):
@@ -217,7 +217,7 @@ def main(env=os.environ, started=Started, scgi=0):
 	
 	# If we had any warnings, add those
 	if Warnings:
-		tmpl['error'] = '<br>\n'.join(Warnings)
+		tmpl['error'] = '<br />\n'.join(Warnings)
 	else:
 		tmpl.extract('show_error')
 	
@@ -228,12 +228,12 @@ def main(env=os.environ, started=Started, scgi=0):
 	
 	# Timing info
 	if 0:
-		print 'startup: %.4fs<br>\n' % (t1 - Started)
-		print 'parse_env: %.4fs<br>\n' % (t2 - t1)
-		print 'thumbs: %.4fs<br>\n' % (t3 - t2)
-		print 'display: %.4fs<br>\n' % (t4 - t3)
-		print 'finish_tmpl: %.4fs<br>\n' % (t5 - t4)
-		print 'print_tmpl: %.4fs<br>\n' % (time.time() - t5)
+		print 'startup: %.4fs<br />\n' % (t1 - Started)
+		print 'parse_env: %.4fs<br />\n' % (t2 - t1)
+		print 'thumbs: %.4fs<br />\n' % (t3 - t2)
+		print 'display: %.4fs<br />\n' % (t4 - t3)
+		print 'finish_tmpl: %.4fs<br />\n' % (t5 - t4)
+		print 'print_tmpl: %.4fs<br />\n' % (time.time() - t5)
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
@@ -364,15 +364,15 @@ def DisplayDir(data):
 			parts = []
 			
 			if Conf['thumb_name']:
-				part = '<br>%s' % image_name.replace('_', ' ')
+				part = '<br />%s' % image_name.replace('_', ' ')
 				parts.append(part)
 			
 			if Conf['thumb_dimensions']:
-				part = '<br><span>(%s x %s)</span>' % (image_width, image_height)
+				part = '<br /><span>(%s x %s)</span>' % (image_width, image_height)
 				parts.append(part)
 			
 			if Conf['thumb_size']:
-				part = '<br><span>%s</span>' % (image_size)
+				part = '<br /><span>%s</span>' % (image_size)
 				parts.append(part)
 			
 			row['extra'] = ''.join(parts)
@@ -381,6 +381,8 @@ def DisplayDir(data):
 			
 			row['thumb_img'] = '%s/%s' % (Conf['thumbs_web'], thumb_name)
 			row['thumb_params'] = ThumbImgParams(thumb_width, thumb_height)
+			
+			row['alt'] = 'Thumbnail for %s' % (image_name)
 			
 			images.append(row)
 	
@@ -426,7 +428,7 @@ def DisplayImage(data, image_name):
 		prev_enc = Quote(prev[0])
 		img_params = ThumbImgParams(prev[6], prev[7])
 		
-		tmpl['prevlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
+		tmpl['prevlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br />%s</a>' % (
 			SCRIPT_NAME, prev[1], Conf['thumbs_web'], prev[5], img_params, prev_enc)
 	
 	# Next image
@@ -435,12 +437,12 @@ def DisplayImage(data, image_name):
 		next_enc = Quote(next[0])
 		img_params = ThumbImgParams(next[6], next[7])
 		
-		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br>%s</a>' % (
+		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br />%s</a>' % (
 			SCRIPT_NAME, next[1], Conf['thumbs_web'], next[5], img_params, next_enc)
 	
 	# If there's a resized one, we'll display that
 	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:
-		tmpl['this_img'] = '(resized)<br><a href="%s/%s/_full_"><img src="%s/%s" width="%s" height="%s" alt="%s"></a>' % (
+		tmpl['this_img'] = '(resized)<br /><a href="%s/%s/_full_"><img src="%s/%s" width="%s" height="%s" alt="%s"></a>' % (
 			SCRIPT_NAME, this[1], Conf['resized_web'], this[5], this[-2], this[-1], this[0]
 		)
 	# Guess not, just display the image
@@ -452,13 +454,13 @@ def DisplayImage(data, image_name):
 	parts = []
 	
 	if Conf['image_name']:
-		part = '<h2>%s</h2><br>\n' % (this[0])
+		part = '<h2>%s</h2><br />\n' % (this[0])
 		parts.append(part)
 	if Conf['image_dimensions']:
-		part = '<span>%s x %s</span><br>\n' % (this[3], this[4])
+		part = '<span>%s x %s</span><br />\n' % (this[3], this[4])
 		parts.append(part)
 	if Conf['image_size']:
-		part = '<span>%s</span><br>\n' % (this[2])
+		part = '<span>%s</span><br />\n' % (this[2])
 		parts.append(part)
 	
 	tmpl['extra'] = ''.join(parts)
