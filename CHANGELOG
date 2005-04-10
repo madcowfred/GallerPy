@@ -1,4 +1,11 @@
 -------------------
+0.6.1    2005-??-??
+-------------------
+* Include .JPE in the list of recognised extensions.
+* Include .BMP in the list of recognised extensions, but don't make any extra
+  effort to import it's opener early.
+
+-------------------
 0.6.0    2004-12-28
 -------------------
 * Added a 'header_file' option, which displays the contents of a text file if

@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-__version__ = '0.6.0'
+__version__ = '0.6.1pre1'
 
 from __future__ import generators
 
@@ -47,8 +47,9 @@ import PngImagePlugin
 
 OPEN = {
 	'.gif': GifImagePlugin.GifImageFile,
-	'.jpg': JpegImagePlugin.JpegImageFile,
+	'.jpe': JpegImagePlugin.JpegImageFile,
 	'.jpeg': JpegImagePlugin.JpegImageFile,
+	'.jpg': JpegImagePlugin.JpegImageFile,
 	'.png': PngImagePlugin.PngImageFile,
 }
 

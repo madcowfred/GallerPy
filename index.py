@@ -47,7 +47,7 @@ from yats import TemplateDocument
 import dircache
 CACHE = {}
 
-IMAGE_RE = re.compile(r'\.(gif|jpe?g|png)$', re.I)
+IMAGE_RE = re.compile(r'\.(bmp|gif|jpe|jpe?g|png)$', re.I)
 
 # ---------------------------------------------------------------------------
 # Spit out a traceback in a sane manner
