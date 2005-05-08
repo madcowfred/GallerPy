@@ -4,6 +4,7 @@
 * Include .JPE in the list of recognised extensions.
 * Include .BMP in the list of recognised extensions, but don't make any extra
   effort to import it's opener early.
+* Include '.svn' and '_svn' in the default hide_dirs listing.
 
 -------------------
 0.6.0    2004-12-28
