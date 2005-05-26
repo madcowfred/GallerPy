@@ -96,7 +96,7 @@ class StringTemplate:
         return self.substitutions[name]
       
     def __str__(self):
-        return self._sub(self.source)
+        return self._sub(self.source).replace('<!---->', '')
 
     def _sub(self, source, subs=None):
         """Perform source text substitutions.
