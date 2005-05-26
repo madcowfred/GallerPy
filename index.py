@@ -1,9 +1,5 @@
 #!/usr/bin/env python
-
-'A simple web gallery written in Python. Supports GIF/JPEG/PNG images so far.'
-
-__author__ = 'freddie@madcowdisease.org'
-
+#
 # Copyright (c) 2004, Freddie
 # All rights reserved.
 #
@@ -30,6 +26,10 @@ __author__ = 'freddie@madcowdisease.org'
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+
+'A simple web gallery written in Python.'
+
+__author__ = 'freddie@madcowdisease.org'
 
 import time
 Started = time.time()
@@ -253,9 +253,6 @@ def main(env=os.environ, started=Started, scgi=0):
 		print 'display: %.4fs<br />\n' % (t4 - t3)
 		print 'finish_tmpl: %.4fs<br />\n' % (t5 - t4)
 		print 'print_tmpl: %.4fs<br />\n' % (time.time() - t5)
-		
-		#for k, v in env.items():
-		#	print k, '=>', v, '<br>'
 
 # ---------------------------------------------------------------------------
 # Update the thumbnails for a directory. Returns a dictionary of data
@@ -556,7 +553,8 @@ def Quote(s):
 
 def GetTemplate(title=None):
 	if title == 'Error!':
-		tmpl = TemplateDocument('default.tmpl')
+		defpath = os.path.join(os.path.split(SCRIPT_FILENAME)[0], 'default.tmpl')
+		tmpl = TemplateDocument(defpath)
 	else:
 		tmpl = TemplateDocument(Conf['template'])
 	
@@ -568,20 +566,29 @@ def GetTemplate(title=None):
 	else:
 		tmpl['title'] = '%s' % (gallery_name)
 	
-	# Find our CSS file
-	css_file = GetPaths(Conf['css_file'])[0]
-	if css_file is None:
-		css_file = 'default.css'
-	tmpl['css_file'] = css_file
-	
-	# Work out the box size for thumbnails
-	tmpl['thumb_width'] = Conf['thumb_width'] + 10
-	
-	add = (Conf['thumb_name'] + Conf['thumb_dimensions'] + Conf['thumb_size']) * 16
-	tmpl['thumb_height'] = Conf['thumb_height'] + 16 + add
+	# Are we showing the header?
+	if Conf['show_header']:
+		# Find our CSS file
+		css_file = GetPaths(Conf['css_file'])[0]
+		if css_file is None:
+			css_file = 'default.css'
+		tmpl['css_file'] = css_file
+		
+		# Work out the box size for thumbnails
+		tmpl['thumb_width'] = Conf['thumb_width'] + 10
+		
+		add = (Conf['thumb_name'] + Conf['thumb_dimensions'] + Conf['thumb_size']) * 16
+		tmpl['thumb_height'] = Conf['thumb_height'] + 16 + add
+	# Guess not
+	else:
+		tmpl.extract('show_header')
 	
 	# Our version!
 	tmpl['version'] = __version__
+	
+	# Are we not showing the footer?
+	if not Conf['show_footer']:
+		tmpl.extract('show_footer')
 	
 	# And send it back
 	return tmpl
