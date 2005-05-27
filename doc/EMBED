@@ -1,0 +1,40 @@
+This document is supposed to be helpful for embedding GallerPy into other web
+monsters.
+
+
+Firstly, you'll need to copy the CSS definitions into your main stylesheet,
+or maybe link to two (if that works). You'll also need to manually generate
+the div.thumbnail block (see the top of default.tmpl), as GallerPy will
+not be outputting the header and footer.
+
+
+Set show_header and show_footer to 0 in gallerpy.conf, change root_local
+to the path to your images, and root_web to the path they exist as on your
+webserver.
+
+
+You'll need to fake some of the environment information in the calling app:
+
+	import GallerPy.index
+	
+	# Fake up some environment info
+	env = {}
+	env['PATH_INFO'] = os.getenv('PATH_INFO')[8:]
+	env['SCRIPT_FILENAME'] = os.path.join(os.path.dirname(os.getenv('SCRIPT_FILENAME')), 'GallerPy/index.py')
+	env['SCRIPT_NAME'] = '%s/gallery' % (os.getenv('SCRIPT_NAME'))
+	
+	cwd = os.getcwd()
+	GallerPy.index.main(env=env)
+	os.chdir(cwd)
+
+PATH_INFO should be the current PATH_INFO minus any specifier used for the
+gallery. In my case, it will be "/gallery/foo", so I grab the "/foo" from it.
+
+SCRIPT_FILENAME should be the complete local path to the GallerPy index.py, or
+it can't find it's config and template.
+
+SCRIPT_NAME should be the complete web path to your gallery, which happens to
+be "/mcd/gallery" for me usually.
+
+The getcwd() and chdir() call are more than likely neccessary, since GallerPy
+will chdir() to your root_local path before doing anything useful.
