@@ -416,7 +416,8 @@ def DisplayDir(data):
 			row['image_link'] = '%s/%s' % (SCRIPT_NAME, Quote(image_file))
 			
 			row['thumb_img'] = '%s/%s' % (Conf['thumbs_web'], thumb_name)
-			row['thumb_params'] = ThumbImgParams(thumb_width, thumb_height)
+			
+			row['divbit'], row['thumb_params'] = ThumbImgParams(thumb_width, thumb_height)
 			
 			row['alt'] = 'Thumbnail for %s' % (image_name)
 			
@@ -466,19 +467,19 @@ def DisplayImage(data, image_name):
 	if n > 0:
 		prev = data['images'][n-1]
 		prev_enc = Quote(prev[1])
-		img_params = ThumbImgParams(prev[6], prev[7])
+		divbit, img_params = ThumbImgParams(prev[6], prev[7])
 		
-		tmpl['prevlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br />%s</a>' % (
-			SCRIPT_NAME, prev_enc, Conf['thumbs_web'], prev[5], img_params, prev[0])
+		tmpl['prevlink'] = '<div%s><a href="%s/%s"><img src="%s/%s" %s><br />%s</a></div>' % (
+			divbit, SCRIPT_NAME, prev_enc, Conf['thumbs_web'], prev[5], img_params, prev[0])
 	
 	# Next image
 	if data['images'][n+1:n+2]:
 		next = data['images'][n+1]
 		next_enc = Quote(next[1])
-		img_params = ThumbImgParams(next[6], next[7])
+		divbit, img_params = ThumbImgParams(next[6], next[7])
 		
-		tmpl['nextlink'] = '<a href="%s/%s"><img src="%s/%s" %s><br />%s</a>' % (
-			SCRIPT_NAME, next_enc, Conf['thumbs_web'], next[5], img_params, next[0])
+		tmpl['nextlink'] = '<div%s><a href="%s/%s"><img src="%s/%s" %s><br />%s</a></div>' % (
+			divbit, SCRIPT_NAME, next_enc, Conf['thumbs_web'], next[5], img_params, next[0])
 	
 	# If there's a resized one, we'll display that
 	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:
@@ -541,14 +542,15 @@ def GetPaths(path):
 # ---------------------------------------------------------------------------
 # Return a string usable as <img> tag parameters
 def ThumbImgParams(width, height):
+	divbit = ''
 	params = 'width="%s" height="%s"' % (width, height)
 	
 	if Conf['thumb_pad']:
 		pad_top = Conf['thumb_height'] - height
 		if pad_top > 0:
-			params += ' style="padding-top: %spx;"' % pad_top
+			divbit = ' style="padding-top: %spx;"' % (pad_top)
 	
-	return params
+	return divbit, params
 
 # ---------------------------------------------------------------------------
 # Safely quote a string for a URL

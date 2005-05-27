@@ -10,6 +10,7 @@
 * Include .JPE in the list of recognised extensions.
 * Include '.svn' and '_svn' in the default hide_dirs listing.
 * Strip empty "<!---->" tags from output.
+* Change how we do top padding of thumbnail images.
 * Change the default header_file from index.txt to header.txt, since index.txt
   is a bit confusing.
 * Fix ShowError() not working properly if GallerPy is running embedded in
