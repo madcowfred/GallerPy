@@ -12,7 +12,7 @@
 * Strip empty "<!---->" tags from output.
 * Change the default header_file from index.txt to header.txt, since index.txt
   is a bit confusing.
-* Fix ShowError not working properly if GallerPy is running embedded in
+* Fix ShowError() not working properly if GallerPy is running embedded in
   something else.
 
 -------------------
