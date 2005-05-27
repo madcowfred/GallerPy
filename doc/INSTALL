@@ -1,0 +1,52 @@
+Requirements
+------------
+* Python 2.2 or newer
+* Python Imaging Library - http://www.pythonware.com/products/pil/
+* Psyco (optional) - http://psyco.sourceforge.net/
+
+
+Installation
+------------
+1. You've obviously already unpacked the .tar.gz, now you need to copy the
+   files gallery directory:
+   
+   $ cp * ~/www.kapow.com/gallery
+
+
+2. If you don't like the default options, edit your copy of 'gallerpy.conf'.
+
+
+3. Now you need to do some Apache modifying. If you just want a single vhost
+   with gallery magic, you'll need something like this in your httpd.conf:
+   
+   <VirtualHost www.kapow.com>
+       # normal vhost options
+       <Directory /home/woof/www.kapow.com/gallery>
+           AddHandler cgi-script .py
+           DirectoryIndex index.py
+           Options +ExecCGI
+       </Directory>
+   </VirtualHost>
+   
+   Or if your web host allows it, you can do it with a .htaccess file in your
+   gallery directory:   
+   
+   AddHandler cgi-script .py
+   DirectoryIndex index.py
+   Options +ExecCGI
+
+
+4. Finally, make your thumbs directory and get things ready:
+   
+   $ mkdir thumbs
+   $ chmod 777 thumbs      (world writable, so Apache can write to it)
+   $ chmod 755 index.py    (executable, so it works)
+
+
+6. Test it out! If you get a 500 Internal server error, try running index.py
+   from the command line:
+   
+   $ python index.py
+   
+   If it works there, try changing the first line of index.py to point to
+   your python binary ('which python').
