@@ -1,10 +1,19 @@
 -------------------
-0.6.1    2005-??-??
+0.7.0    2005-??-??
 -------------------
-* Include .JPE in the list of recognised extensions.
+* Add 'show_header' and 'show_footer' options to control the output of HTML
+  header and footer information.
+* Add 'root_local' and 'root_web' options to allow easier embedding of GallerPy
+  into other applications.
 * Include .BMP in the list of recognised extensions, but don't make any extra
-  effort to import it's opener early.
+  effort to import it's opener early since it won't get used much.
+* Include .JPE in the list of recognised extensions.
 * Include '.svn' and '_svn' in the default hide_dirs listing.
+* Strip empty "<!---->" tags from output.
+* Change the default header_file from index.txt to header.txt, since index.txt
+  is a bit confusing.
+* Fix ShowError not working properly if GallerPy is running embedded in
+  something else.
 
 -------------------
 0.6.0    2004-12-28

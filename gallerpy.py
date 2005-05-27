@@ -1,5 +1,3 @@
-"This file contains the various common code that we would like to use."
-
 # Copyright (c) 2004, Freddie
 # All rights reserved.
 #
@@ -27,7 +25,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-__version__ = '0.6.1pre1'
+"This file contains the various common code that we would like to use."
+
+__author__ = 'Freddie (freddie@madcowdisease.org)'
+__version__ = '0.7.0pre'
 
 from __future__ import generators
 

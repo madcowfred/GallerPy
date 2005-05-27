@@ -182,11 +182,14 @@ def main(env=os.environ, started=Started, scgi=0):
 		if bits[-1] in Conf['hide_dirs']:
 			return ShowError('Access denied: %s', path_info)
 	
+	# If we have a different local root, we need to change path
+	if ('root_local' in Conf and 'root_web' in Conf):
+		os.chdir(Conf['root_local'])
+	
 	# Check the path to make sure it's valid
 	image_dir = GetPaths(path_info)[1]
 	if image_dir is None:
 		return ShowError('Path does not exist: %s', path_info)
-	
 	
 	# We need to know what the current dir is
 	Paths['current'] = path_info or '.'
@@ -224,7 +227,8 @@ def main(env=os.environ, started=Started, scgi=0):
 	t5 = time.time()
 	
 	# We are HTML!
-	print 'Content-type: text/html'
+	if Conf['show_header']:
+		print 'Content-type: text/html'
 	
 	# If we're using GZIP, it might be time to squish
 	if Conf['use_gzip'] and env.get('HTTP_ACCEPT_ENCODING', '').find('gzip') >= 0:
@@ -509,8 +513,12 @@ def DisplayImage(data, image_name):
 # ---------------------------------------------------------------------------
 # Get a (URL, local) path for something
 def GetPaths(path):
-	dsf = os.path.dirname(SCRIPT_FILENAME)
-	dsn = os.path.dirname(SCRIPT_NAME)
+	if ('root_local' in Conf and 'root_web' in Conf):
+		dsf = Conf['root_local']
+		dsn = Conf['root_web']
+	else:
+		dsf = os.path.dirname(SCRIPT_FILENAME)
+		dsn = os.path.dirname(SCRIPT_NAME)
 	
 	# Absolute path
 	if path.startswith(os.sep):
