@@ -1,4 +1,4 @@
-# Copyright (c) 2004, Freddie
+# Copyright (c) 2004-2005, Freddie
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 "This file contains the various common code that we would like to use."
 
 __author__ = 'Freddie (freddie@madcowdisease.org)'
-__version__ = '0.7.0pre'
+__version__ = '0.7.0'
 
 from __future__ import generators
 
