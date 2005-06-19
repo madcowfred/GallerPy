@@ -66,7 +66,10 @@ def load_config(filepath):
 		if Conf[option].isdigit():
 			Conf[option] = int(Conf[option])
 	
-	Conf['hide_dirs'] = {}.fromkeys(Conf['hide_dirs'].split('|'), 1)
+	hide_dirs = {}
+	for k in Conf['hide_dirs'].split('|'):
+		hide_dirs[k] = 1
+	Conf['hide_dirs'] = hide_dirs
 	
 	return Conf
 
