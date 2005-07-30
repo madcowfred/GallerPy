@@ -2,6 +2,7 @@
 0.7.1    2005-??-??
 -------------------
 * Fix 'hide_dirs' option parsing so it works on Python 2.2, oops.
+* Fix hash characters ('#') not being quoted for image URLs.
 
 -------------------
 0.7.0    2005-06-16

@@ -555,7 +555,7 @@ def ThumbImgParams(width, height):
 # ---------------------------------------------------------------------------
 # Safely quote a string for a URL
 def Quote(s):
-	for char in (';?:@&=+$, '):
+	for char in (';?:@&=+$#, '):
 		s = s.replace(char, '%%%02X' % ord(char))
 	return s
 
