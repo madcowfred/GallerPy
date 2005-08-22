@@ -39,25 +39,26 @@ def main():
 	# Parse our config
 	Conf = load_config('gallerpy.conf')
 	
-	if 'thumbs_local' not in Conf:
-		Conf['thumbs_local'] = 'thumbs'
-	if 'resized_local' not in Conf:
-		Conf['resized_local'] = '_resized'
-	
 	started = time.time()
 	
 	# Work out where we're going
 	if len(sys.argv) == 2:
 		walkdir = os.path.abspath(sys.argv[1])
+	elif 'root_local' in Conf:
+		walkdir = os.path.abspath(Conf['root_local'])
 	else:
 		walkdir = os.path.abspath('.')
+	
 	walklen = len(os.sep) + len(walkdir)
 	
+	if 'thumbs_local' not in Conf:
+		Conf['thumbs_local'] = os.path.join(walkdir, 'thumbs')
+	if 'resized_local' not in Conf:
+		Conf['resized_local'] = os.path.join(walkdir, '_resized')
+	
 	# Make sure our thumbs dir exists
-	# FIXME: why don't we honor thumbs_local?
-	thumb_path = os.path.join(walkdir, 'thumbs')
-	if not os.path.exists(thumb_path):
-		print "ERROR: %s doesn't exist!" % (thumb_path)
+	if not os.path.exists(Conf['thumbs_local']):
+		print "ERROR: %s doesn't exist!" % (Conf['thumbs_local'])
 		sys.exit(1)
 	
 	# Change to the root dir and off we go
@@ -95,11 +96,11 @@ def main():
 	
 	# Now clean up any missing thumbs
 	deadthumbs = 0
-	for filename in os.listdir(thumb_path):
+	for filename in os.listdir(Conf['thumbs_local']):
 		if filename in thumbs:
 			continue
 		
-		filepath = os.path.join(thumb_path, filename)
+		filepath = os.path.join(Conf['thumbs_local'], filename)
 		if not os.path.isfile(filepath):
 			continue
 		
