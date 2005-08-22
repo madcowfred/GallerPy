@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2004, Freddie
+# Copyright (c) 2004-2005, Freddie
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
