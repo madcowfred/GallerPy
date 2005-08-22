@@ -32,7 +32,7 @@ __version__ = '0.7.0'
 
 from __future__ import generators
 
-import base64
+import md5
 import os
 import sys
 
@@ -100,11 +100,11 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 		if lfext not in OPEN:
 			continue
 		
-		# We need a base64 encoded filename
-		b64 = base64.encodestring(froot).replace('\n', '')
+		# We use an MD5 digest of the file path+name for the thumbnail name
+		md5sum = md5.new(froot).hexdigest()
 		
 		# Work out our thumbnail filename
-		thumb_name = '%s%s' % (b64, fext)
+		thumb_name = '%s%s' % (md5sum, fext)
 		thumb_path = os.path.join(Conf['thumbs_local'], thumb_name)
 		
 		# See if we need to generate a new thumbnail

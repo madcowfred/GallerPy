@@ -27,7 +27,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import base64
 import os
 import sys
 import time
@@ -55,18 +54,18 @@ def main():
 	walklen = len(os.sep) + len(walkdir)
 	
 	# Make sure our thumbs dir exists
+	# FIXME: why don't we honor thumbs_local?
 	thumb_path = os.path.join(walkdir, 'thumbs')
 	if not os.path.exists(thumb_path):
 		print "ERROR: %s doesn't exist!" % (thumb_path)
 		sys.exit(1)
 	
-	# Change to the root dir
+	# Change to the root dir and off we go
 	os.chdir(walkdir)
-	
-	# And off we go
 	os.umask(0000)
 	
 	made = 0
+	thumbs = {}
 	
 	for root, dirs, files in walk(walkdir):
 		for hide in Conf['hide_dirs']:
@@ -81,30 +80,37 @@ def main():
 		
 		print '> Entering %s' % (root[walklen:])
 		
-		newthumbs, _, _, warnings = generate_thumbnails(Conf, root[walklen:], files, sizes=0)
-		for warning in warnings:
+		newthumbs, _, images, warns = generate_thumbnails(Conf, root[walklen:], files, sizes=0)
+		for warning in warns:
 			print warning
 		
 		made += newthumbs
+		
+		for img in images:
+			thumbs[img[5]] = None
 	
 	# Done
 	print
 	print 'Generated %d thumbnail(s) in %.1fs' % (made, time.time() - started)
 	
 	# Now clean up any missing thumbs
-	killed = 0
+	deadthumbs = 0
 	for filename in os.listdir(thumb_path):
-		root, ext = os.path.splitext(filename)
-		decoded = '%s%s' % (base64.decodestring(root).replace('\n', ''), ext)
+		if filename in thumbs:
+			continue
 		
-		if not os.path.exists(decoded) or decoded.startswith(os.sep):
-			filepath = os.path.join(thumb_path, filename)
-			os.remove(filepath)
-			killed += 1
+		filepath = os.path.join(thumb_path, filename)
+		if not os.path.isfile(filepath):
+			continue
+		
+		os.remove(filepath)
+		deadthumbs += 1
 	
-	if killed:
-		print 'Removed %d stale thumbnails' % (killed)
+	if deadthumbs:
+		print 'Removed %d stale thumbnails' % (deadthumbs)
 	
+	# FIXME: clean up resized images dir too
+
 # ---------------------------------------------------------------------------
 
 if __name__ == '__main__':
