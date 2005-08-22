@@ -483,7 +483,7 @@ def DisplayImage(data, image_name):
 	
 	# If there's a resized one, we'll display that
 	if Conf['use_resized'] and this[-2] and this[-1] and not FullImage:
-		tmpl['this_img'] = '    (resized)<br /><a href="%s/%s/_full_"><img src="%s/%s" width="%s" height="%s" alt="%s"></a>' % (
+		tmpl['this_img'] = '    (click image for full size)<br /><a href="%s/%s/_full_"><img src="%s/%s" width="%s" height="%s" alt="%s"></a>' % (
 			SCRIPT_NAME, this[1], Conf['resized_web'], this[5], this[-2], this[-1], this[0]
 		)
 	# Guess not, just display the image
