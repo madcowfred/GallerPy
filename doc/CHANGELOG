@@ -1,12 +1,15 @@
 -------------------
-0.8.0    2005-??-??
+0.8.0    2006-??-??
 -------------------
+* Add 'thumb_jpeg' option to always generate JPEG thumbnails.
 * Change thumbnail generator to use an MD5 digest of the filepath instead of
   the huge base64 encoded string. This means you get to regenerate your thumbs,
   joy.
 * Change '(resized)' text to be more clear.
 * Fix 'hide_dirs' option parsing so it works on Python 2.2, oops.
 * Fix hash characters ('#') not being quoted for image URLs.
+* Fix genthumbs.py not honouring thumbs_local and root_local config settings.
+* Fix a possible issue with non-lowercase filename extensions.
 * Updated year in copyright notice.
 
 -------------------
