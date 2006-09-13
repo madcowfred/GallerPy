@@ -164,6 +164,10 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			
 			image_width, image_height = img.size
 			
+			# If it's not a truecolor image, make it one
+			if Conf['thumb_jpeg'] and img.mode != 'RGB':
+				img = img.convert('RGB')
+			
 			# Thumbnail it
 			try:
 				img.thumbnail((Conf['thumb_width'], Conf['thumb_height']), resize_method)
@@ -173,10 +177,6 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 				continue
 			
 			thumb_width, thumb_height = img.size
-			
-			# If it's not a truecolor image, make it one
-			if Conf['thumb_jpeg'] and img.mode != 'RGB':
-				img = img.convert('RGB')
 			
 			# Save the thumbnail
 			try:
