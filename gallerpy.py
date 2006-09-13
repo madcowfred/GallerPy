@@ -1,4 +1,4 @@
-# Copyright (c) 2004-2005, Freddie
+# Copyright (c) 2004-2006, Freddie
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 "This file contains the various common code that we would like to use."
 
 __author__ = 'Freddie (freddie@madcowdisease.org)'
-__version__ = '0.7.0'
+__version__ = '0.8.0svn'
 
 from __future__ import generators
 
@@ -101,10 +101,13 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			continue
 		
 		# We use an MD5 digest of the file path+name for the thumbnail name
-		md5sum = md5.new(froot).hexdigest()
+		md5sum = md5.new(image_path).hexdigest()
 		
 		# Work out our thumbnail filename
-		thumb_name = '%s%s' % (md5sum, fext)
+		if thumb_jpeg:
+			thumb_name = '%s.jpg' % (md5sum)
+		else:
+			thumb_name = '%s%s' % (md5sum, fext)
 		thumb_path = os.path.join(Conf['thumbs_local'], thumb_name)
 		
 		# See if we need to generate a new thumbnail
@@ -183,7 +186,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 		
 		# Or we need to get image size info from the file
 		elif sizes == 1:
-			image_width, image_height = OPEN.get(fext, Image.open)(image_path).size
+			image_width, image_height = OPEN.get(lfext, Image.open)(image_path).size
 			
 			x, y = image_width, image_height
 			
@@ -240,7 +243,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 		# Or we need to get image size info from the file
 		elif sizes == 1:
 			if (image_width, image_height) == (0, 0):
-				image_width, image_height = OPEN.get(fext, Image.open)(image_path).size
+				image_width, image_height = OPEN.get(lfext, Image.open)(image_path).size
 			
 			x, y = image_width, image_height
 			
