@@ -104,7 +104,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 		md5sum = md5.new(image_path).hexdigest()
 		
 		# Work out our thumbnail filename
-		if thumb_jpeg:
+		if Conf['thumb_jpeg']:
 			thumb_name = '%s.jpg' % (md5sum)
 		else:
 			thumb_name = '%s%s' % (md5sum, fext)
