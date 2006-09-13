@@ -174,6 +174,10 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			
 			thumb_width, thumb_height = img.size
 			
+			# If it's not a truecolor image, make it one
+			if Conf['thumb_jpeg'] and im.mode != 'RGB':
+				im = im.convert('RGB')
+			
 			# Save the thumbnail
 			try:
 				img.save(thumb_path)
