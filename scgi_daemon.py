@@ -56,7 +56,8 @@ class GallerPyHandler(scgi_server.SCGIHandler):
 		sys.__stdout__ = sys.stdout = _out
 		
 		# Work out wtf our PATH_INFO and SCRIPT_NAME should be
-		env['PATH_INFO'] = env['SCRIPT_NAME'][len(self.prefix):]
+		if not env.has_key('PATH_INFO'):
+			env['PATH_INFO'] = env['SCRIPT_NAME'][len(self.prefix):]
 		env['SCRIPT_FILENAME'] = sys.argv[0]
 		env['SCRIPT_NAME'] = self.prefix
 		
