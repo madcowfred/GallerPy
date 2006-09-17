@@ -10,6 +10,8 @@
 * Fix hash characters ('#') not being quoted for image URLs.
 * Fix genthumbs.py not honouring thumbs_local and root_local config settings.
 * Fix a possible issue with non-lowercase filename extensions.
+* Fix scgi_handler and PATH_INFO. If the httpd provides PATH_INFO via the SCGI
+  environment like it's meant to, don't overwrite it.
 * Updated year in copyright notice.
 
 -------------------
