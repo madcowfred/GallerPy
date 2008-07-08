@@ -1,4 +1,4 @@
-# Copyright (c) 2004-2006, Freddie
+# Copyright (c) 2004-2008, Freddie
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,12 +25,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import generators
+
 "This file contains the various common code that we would like to use."
 
 __author__ = 'Freddie (freddie@madcowdisease.org)'
 __version__ = '0.8.0svn'
-
-from __future__ import generators
 
 import md5
 import os
