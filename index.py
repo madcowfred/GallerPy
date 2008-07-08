@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2004-2006, Freddie
+# Copyright (c) 2004-2008, Freddie
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -228,7 +228,11 @@ def main(env=os.environ, started=Started, scgi=0):
 	
 	# We are HTML!
 	if Conf['show_header']:
-		print 'Content-type: text/html'
+		encoding = Conf.get('encoding', None)
+		if encoding is not None:
+			print 'Content-type: text/html; charset=%s' % (encoding)
+		else:
+			print 'Content-type: text/html'
 	
 	# If we're using GZIP, it might be time to squish
 	if Conf['use_gzip'] and env.get('HTTP_ACCEPT_ENCODING', '').find('gzip') >= 0:

@@ -1,7 +1,8 @@
 -------------------
-0.8.0    2006-??-??
+0.8.0    2008-??-??
 -------------------
 * Add 'thumb_jpeg' option to always generate JPEG thumbnails.
+* Add 'encoding' option to specify the document character set. (Marcus Dione)
 * Change thumbnail generator to use an MD5 digest of the filepath instead of
   the huge base64 encoded string. This means you get to regenerate your thumbs,
   joy.

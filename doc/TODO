@@ -1,2 +1,8 @@
 * Allow browsing by specific resolution / aspect ratio.
-* Allow thumbnails to be forced into a specific image format.
+  - This should be a relatively simple hook into the caching system, and too
+    hideous to imagine if running as a CGI script.
+  - How do we handle unvisited directories?
+    - Scan on startup.
+    - Only show files from visited/cached directories.
+    - Periodic scan.
+  
