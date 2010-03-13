@@ -32,7 +32,7 @@ from __future__ import generators
 __author__ = 'Freddie (freddie@madcowdisease.org)'
 __version__ = '0.8.0svn'
 
-import md5
+import hashlib
 import os
 import sys
 
@@ -101,7 +101,7 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			continue
 		
 		# We use an MD5 digest of the file path+name for the thumbnail name
-		md5sum = md5.new(image_path).hexdigest()
+		md5sum = hashlib.md5(image_path).hexdigest()
 		
 		# Work out our thumbnail filename
 		if Conf['thumb_jpeg']:
