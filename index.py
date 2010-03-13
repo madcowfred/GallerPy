@@ -39,7 +39,7 @@ import re
 import sys
 import traceback
 
-from gallerpy import __version__, load_config, generate_thumbnails, walk
+from gallerpy import __version__, load_config, generate_thumbnails
 from yats import TemplateDocument
 
 # ---------------------------------------------------------------------------

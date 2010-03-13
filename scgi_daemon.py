@@ -61,17 +61,8 @@ class GallerPyHandler(scgi_server.SCGIHandler):
 		env['SCRIPT_FILENAME'] = sys.argv[0]
 		env['SCRIPT_NAME'] = self.prefix
 		
-		# Test
-		if 0:
-			print 'Content-type: text/plain'
-			print
-			
-			for k, v in env.items():
-				print k, '==>', v
-		
 		# Show the page
-		if 1:
-			index.main(env=env, started=started, scgi=1)
+		index.main(env=env, started=started, scgi=1)
 		
 		# Clean up
 		try:

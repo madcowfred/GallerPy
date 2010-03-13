@@ -30,7 +30,7 @@ from __future__ import generators
 "This file contains the various common code that we would like to use."
 
 __author__ = 'Freddie (freddie@madcowdisease.org)'
-__version__ = '0.8.0svn'
+__version__ = '0.8.0git'
 
 import hashlib
 import os
@@ -279,35 +279,6 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 	
 	# All done
 	return newthumbs, dirs, images, warnings
-
-# ---------------------------------------------------------------------------
-# Borrowed from Python 2.3 so we still work with 2.2
-def walk(top):
-	from os.path import join, isdir, islink, normpath
-	
-	try:
-		names = os.listdir(top)
-	except OSError:
-		return
-	
-	dirs, nondirs = [], []
-	for name in names:
-		topname = join(top, name)
-		
-		if isdir(topname):
-			dirs.append(name)
-		elif islink(topname) and isdir(normpath(topname)):
-			dirs.append(name)
-		else:
-			nondirs.append(name)
-	
-	yield top, dirs, nondirs
-	
-	for name in dirs:
-		path = join(top, name)
-		#if not islink(path):
-		for x in walk(path):
-			yield x
 
 # ---------------------------------------------------------------------------
 # Return a nicely formatted size

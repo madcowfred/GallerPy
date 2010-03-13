@@ -31,7 +31,7 @@ import os
 import sys
 import time
 
-from gallerpy import load_config, generate_thumbnails, walk
+from gallerpy import load_config, generate_thumbnails
 
 # ---------------------------------------------------------------------------
 
@@ -68,7 +68,7 @@ def main():
 	made = 0
 	thumbs = {}
 	
-	for root, dirs, files in walk(walkdir):
+	for root, dirs, files in os.walk(walkdir):
 		for hide in Conf['hide_dirs']:
 			if hide in dirs:
 				dirs.remove(hide)
