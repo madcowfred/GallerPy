@@ -111,18 +111,18 @@ def main(env=os.environ, started=Started, scgi=0):
 	
 	t1 = time.time()
 	
-	# We need these
-	global SCRIPT_FILENAME, SCRIPT_NAME
-	SCRIPT_FILENAME = env['SCRIPT_FILENAME']
-	SCRIPT_NAME = env['SCRIPT_NAME']
-	
 	# Some naughty globals
 	global Conf, Paths, Warnings
 	Paths = {}
 	Warnings = []
 	
+	# We need these
+	global SCRIPT_FILENAME, SCRIPT_NAME
+	SCRIPT_FILENAME = env.get('SCRIPT_FILENAME', None)
+	SCRIPT_NAME = env.get('SCRIPT_NAME', None)
+	
 	# Find our config
-	if SCRIPT_FILENAME is None:
+	if SCRIPT_FILENAME is None or SCRIPT_NAME is None:
 		return ShowError('CGI environment is broken!')
 	
 	config_file = os.path.join(os.path.dirname(SCRIPT_FILENAME), 'gallerpy.conf')
@@ -130,7 +130,9 @@ def main(env=os.environ, started=Started, scgi=0):
 		return ShowError('config file is missing!')
 	
 	# Parse our config
+	tc1 = time.time()
 	Conf = load_config(config_file)
+	tc2 = time.time()
 	
 	# Work out some paths
 	if not ('thumbs_local' in Conf and 'thumbs_web' in Conf):
@@ -149,7 +151,7 @@ def main(env=os.environ, started=Started, scgi=0):
 	Conf['template'] = os.path.join(os.path.dirname(SCRIPT_FILENAME), Conf['template'])
 	
 	# Work out what they're after
-	path_info = env.get('PATH_INFO', '') or '.'
+	path_info = env.get('PATH_INFO', None) or '.'
 	
 	# Don't want a starting or ending seperator
 	if path_info.startswith('/'):
@@ -254,8 +256,9 @@ def main(env=os.environ, started=Started, scgi=0):
 		print tmpl
 	
 	# Debug info
-	if 0:
+	if False:
 		print 'startup: %.4fs<br />\n' % (t1 - Started)
+		print 'startup(conf): %.4fs<br />\n' % (tc2 - tc1)
 		print 'parse_env: %.4fs<br />\n' % (t2 - t1)
 		print 'thumbs: %.4fs<br />\n' % (t3 - t2)
 		print 'display: %.4fs<br />\n' % (t4 - t3)
