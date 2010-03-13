@@ -311,13 +311,14 @@ def walk(top):
 
 # ---------------------------------------------------------------------------
 # Return a nicely formatted size
+MB = 1024.0 * 1024
 def NiceSize(bytes):
 	if bytes < 1024:
 		return '%dB' % (bytes)
-	elif bytes < (1024 * 1024):
+	elif bytes < MB:
 		return '%.1fKB' % (bytes / 1024.0)
 	else:
-		return '%.1fMB' % (bytes / 1024.0 / 1024.0)
+		return '%.1fMB' % (bytes / MB)
 
 # ---------------------------------------------------------------------------
 # Useful speedup on larger dirs
