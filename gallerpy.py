@@ -166,7 +166,12 @@ def generate_thumbnails(Conf, root, files, sizes=1):
 			
 			# If it's not a truecolor image, make it one
 			if Conf['thumb_jpeg'] and img.mode != 'RGB':
-				img = img.convert('RGB')
+                try:
+				    img = img.convert('RGB')
+                except Exception, msg:
+                    warning = "Warning: failed to convert '%s' - %s" % (image_name, msg)
+                    warnings.append(warning)
+                    continue
 			
 			# Thumbnail it
 			try:
